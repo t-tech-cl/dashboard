@@ -106,3 +106,8 @@ dist
 
 # wincompare file
 .bak
+
+# env variables
+.env
+
+*package-lock.json
