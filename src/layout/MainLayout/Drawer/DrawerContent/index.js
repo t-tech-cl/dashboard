@@ -1,20 +1,20 @@
 // material-ui
-import { useMediaQuery, useTheme } from '@mui/material';
+// import { useMediaQuery, useTheme } from '@mui/material';
 
 // project import
-import NavCard from './NavCard';
+// import NavCard from './NavCard';
 import Navigation from './Navigation';
-import { useSelector } from 'store';
+// import { useSelector } from 'store';
 import SimpleBar from 'components/third-party/SimpleBar';
 
 // ==============================|| DRAWER CONTENT ||============================== //
 
 const DrawerContent = () => {
-  const theme = useTheme();
-  const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
+  // const theme = useTheme();
+  // const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
 
-  const menu = useSelector((state) => state.menu);
-  const { drawerOpen } = menu;
+  // const menu = useSelector((state) => state.menu);
+  // const { drawerOpen } = menu;
 
   return (
     <SimpleBar
@@ -26,7 +26,7 @@ const DrawerContent = () => {
       }}
     >
       <Navigation />
-      {drawerOpen && !matchDownMD && <NavCard />}
+      {/* {drawerOpen && !matchDownMD && <NavCard />} */}
     </SimpleBar>
   );
 };

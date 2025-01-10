@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
-  Button,
+  // Button,
   Box,
   CardMedia,
   ClickAwayListener,
@@ -28,10 +28,13 @@ import Transitions from 'components/@extended/Transitions';
 import { DRAWER_WIDTH, ThemeMode } from 'config';
 
 // assets
-import { ArrowRightOutlined, WindowsOutlined } from '@ant-design/icons';
+import { 
+  // ArrowRightOutlined, 
+  WindowsOutlined
+} from '@ant-design/icons';
 import backgroundVector from 'assets/images/mega-menu/back.svg';
 import imageChart from 'assets/images/mega-menu/chart.svg';
-import AnimateButton from 'components/@extended/AnimateButton';
+// import AnimateButton from 'components/@extended/AnimateButton';
 
 // ==============================|| HEADER CONTENT - MEGA MENU SECTION ||============================== //
 
@@ -119,7 +122,7 @@ const MegaMenuSection = () => {
                             Try our pre made component pages to check how it feels and suits as per your need.
                           </Typography>
                           <Stack direction="row" justifyContent="space-between" alignItems="flex-end" sx={{ mt: -1 }}>
-                            <AnimateButton>
+                            {/* <AnimateButton>
                               <Button
                                 variant="contained"
                                 color="secondary"
@@ -135,7 +138,7 @@ const MegaMenuSection = () => {
                               >
                                 View All
                               </Button>
-                            </AnimateButton>
+                            </AnimateButton> */}
                             <CardMedia component="img" src={imageChart} alt="Chart" sx={{ mr: -2.5, mb: -2.5, width: 124 }} />
                           </Stack>
                         </Stack>

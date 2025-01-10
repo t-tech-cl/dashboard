@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
+import { Typography, useMediaQuery } from '@mui/material';
 
 // project import
 import DrawerHeaderStyled from './DrawerHeaderStyled';
@@ -31,7 +31,16 @@ const DrawerHeader = ({ open }) => {
         paddingLeft: isHorizontal ? { xs: '24px', lg: '0' } : open ? '24px' : 0
       }}
     >
-      <Logo isIcon={!open} sx={{ width: open ? 'auto' : 35, height: 35 }} />
+      <div
+        style={{ 
+          display: 'flex',
+          flexDirection: 'row',
+          rowGap: '10px',
+        }}
+      >
+        <Logo isIcon sx={{ width: 35, height: 35 }} />
+        {open && (<Typography variant='h3'>T-TECH LTDA</Typography>)}
+      </div>
     </DrawerHeaderStyled>
   );
 };

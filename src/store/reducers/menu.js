@@ -2,7 +2,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 // project import
-import axios from 'utils/axios';
+// import axios from 'utils/axios';
 
 // initial state
 const initialState = {
@@ -18,8 +18,9 @@ const initialState = {
 // ==============================|| SLICE - MENU ||============================== //
 
 export const fetchMenu = createAsyncThunk('', async () => {
-  const response = await axios.get('/api/menu/dashboard');
-  return response.data;
+  // const response = await axios.get('/api/menu/dashboard');
+  // return response.data;
+  return menuDashboard
 });
 
 const menu = createSlice({
@@ -51,11 +52,11 @@ const menu = createSlice({
     }
   },
 
-  extraReducers(builder) {
-    builder.addCase(fetchMenu.fulfilled, (state, action) => {
-      state.menu = action.payload.dashboard;
-    });
-  }
+  // extraReducers() {
+  //   // builder.addCase(fetchMenu.fulfilled, (state, action) => {
+  //     state.menu = menuDashboard;
+  //   // });
+  // }
 });
 
 export default menu.reducer;
