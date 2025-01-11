@@ -11,7 +11,9 @@ import {
   MenuUnfoldOutlined,
   QuestionOutlined,
   SmileOutlined,
-  StopOutlined
+  StopOutlined,
+  FormOutlined,
+  IssuesCloseOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -24,7 +26,9 @@ const icons = {
   SmileOutlined,
   GatewayOutlined,
   QuestionOutlined,
-  DeploymentUnitOutlined
+  DeploymentUnitOutlined,
+  FormOutlined,
+  IssuesCloseOutlined
 };
 
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
@@ -36,10 +40,17 @@ const other = {
   children: [
     {
       id: 'maintenance-request',
-      title: 'Solicitud de mantenimiento',
+      title: 'Solicitud',
       type: 'item',
-      url: '/solicitud-mantenimiento',
-      icon: icons.ChromeOutlined
+      url: '/mantenimiento/solicitud',
+      icon: icons.FormOutlined
+    },
+    {
+      id: 'maintenance-update',
+      title: 'Actualización',
+      type: 'item',
+      url: '/mantenimiento/actualizacion',
+      icon: icons.IssuesCloseOutlined
     },
     // {
     //   id: 'menu-level',

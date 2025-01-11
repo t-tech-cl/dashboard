@@ -4,7 +4,7 @@ export const twitterColor = '#1DA1F2';
 export const facebookColor = '#3b5998';
 export const linkedInColor = '#0e76a8';
 
-export const APP_DEFAULT_PATH = '/solicitud-mantenimiento';
+export const APP_DEFAULT_PATH = '/mantenimiento/solicitud';
 export const HORIZONTAL_MAX_ITEM = 6;
 export const DRAWER_WIDTH = 260;
 
@@ -76,7 +76,7 @@ const config = {
    * 'light' (default) - ThemeMode.LIGHT
    * 'dark' - ThemeMode.DARK
    */
-  mode: ThemeMode.LIGHT,
+  mode: ThemeMode.DARK,
 
   /**
    * the props used for theme primary color variants
@@ -91,7 +91,7 @@ const config = {
    * 'theme7'
    * 'theme8'
    */
-  presetColor: 'default',
+  presetColor: 'theme8',
 
   /**
    * the props used for default theme direction

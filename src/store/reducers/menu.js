@@ -1,12 +1,13 @@
 // third-party
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import other from 'menu-items/other';
 
 // project import
 // import axios from 'utils/axios';
 
 // initial state
 const initialState = {
-  openItem: ['dashboard'],
+  openItem: ['maintenance-request'],
   openComponent: 'buttons',
   selectedID: null,
   drawerOpen: false,
@@ -20,7 +21,7 @@ const initialState = {
 export const fetchMenu = createAsyncThunk('', async () => {
   // const response = await axios.get('/api/menu/dashboard');
   // return response.data;
-  return menuDashboard
+  return other
 });
 
 const menu = createSlice({
@@ -52,11 +53,11 @@ const menu = createSlice({
     }
   },
 
-  // extraReducers() {
-  //   // builder.addCase(fetchMenu.fulfilled, (state, action) => {
-  //     state.menu = menuDashboard;
-  //   // });
-  // }
+  extraReducers(state) {
+    // builder.addCase(fetchMenu.fulfilled, (state, action) => {
+      state.menu = other;
+    // });
+  }
 });
 
 export default menu.reducer;

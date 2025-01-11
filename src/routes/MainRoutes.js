@@ -5,11 +5,12 @@ import MainLayout from 'layout/MainLayout';
 import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
 // import AuthGuard from 'utils/route-guard/AuthGuard';
-import MaintenanceRequest from 'pages/solicitud-mantenimiento';
+import MaintenanceRequest from 'pages/maintenance-request';
+import MaintenanceUpdate from 'pages/maintenance-update';
 
 // render - dashboard
-const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
-const DashboardAnalytics = Loadable(lazy(() => import('pages/dashboard/analytics')));
+// const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
+// const DashboardAnalytics = Loadable(lazy(() => import('pages/dashboard/analytics')));
 
 // // render - widget
 // const WidgetStatistics = Loadable(lazy(() => import('pages/widget/statistics')));
@@ -139,22 +140,26 @@ const MainRoutes = {
         //   ]
         // },
         {
-          path: '/solicitud-mantenimiento',
+          path: '/mantenimiento/solicitud',
           element: <MaintenanceRequest/>
         },
         {
-          path: 'dashboard',
-          children: [
-            {
-              path: 'default',
-              element: <DashboardDefault />
-            },
-            {
-              path: 'analytics',
-              element: <DashboardAnalytics />
-            }
-          ]
+          path: '/mantenimiento/actualizacion',
+          element: <MaintenanceUpdate/>
         },
+        // {
+        //   path: 'dashboard',
+        //   children: [
+        //     {
+        //       path: 'default',
+        //       element: <DashboardDefault />
+        //     },
+        //     {
+        //       path: 'analytics',
+        //       element: <DashboardAnalytics />
+        //     }
+        //   ]
+        // },
         // {
         //   path: 'widget',
         //   children: [
