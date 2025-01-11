@@ -30,15 +30,15 @@ const icons = {
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
 
 const other = {
-  id: 'other',
-  title: <FormattedMessage id="others" />,
+  id: 'mantenimiento',
+  title: <FormattedMessage id="Mantenimiento" />,
   type: 'group',
   children: [
     {
-      id: 'sample-page',
-      title: <FormattedMessage id="sample-page" />,
+      id: 'maintenance-request',
+      title: 'Solicitud de mantenimiento',
       type: 'item',
-      url: '/sample-page',
+      url: '/solicitud-mantenimiento',
       icon: icons.ChromeOutlined
     },
     // {

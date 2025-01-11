@@ -10,12 +10,15 @@ import RTLLayout from 'components/RTLLayout';
 import ScrollTop from 'components/ScrollTop';
 import Snackbar from 'components/@extended/Snackbar';
 import Notistack from 'components/third-party/Notistack';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 
 import { dispatch } from 'store';
 import { fetchMenu } from 'store/reducers/menu';
 
 // auth provider
 import { JWTProvider as AuthProvider } from 'contexts/JWTContext';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 // import { FirebaseProvider as AuthProvider } from 'contexts/FirebaseContext';
 // import { AWSCognitoProvider as AuthProvider } from 'contexts/AWSCognitoContext';
 // import { Auth0Provider as AuthProvider } from 'contexts/Auth0Context';
@@ -38,16 +41,16 @@ const App = () => {
     <ThemeCustomization>
       <RTLLayout>
         <Locales>
-          <ScrollTop>
-            <AuthProvider>
-              <>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <ScrollTop>
+              <AuthProvider>
                 <Notistack>
                   <Routes />
                   <Snackbar />
                 </Notistack>
-              </>
-            </AuthProvider>
-          </ScrollTop>
+              </AuthProvider>
+            </ScrollTop>
+          </LocalizationProvider>
         </Locales>
       </RTLLayout>
     </ThemeCustomization>

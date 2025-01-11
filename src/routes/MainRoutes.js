@@ -4,7 +4,7 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
-import AuthGuard from 'utils/route-guard/AuthGuard';
+// import AuthGuard from 'utils/route-guard/AuthGuard';
 import MaintenanceRequest from 'pages/solicitud-mantenimiento';
 
 // render - dashboard
@@ -109,7 +109,7 @@ const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/500'))
 const MaintenanceUnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-construction')));
 const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/coming-soon')));
 
-const AppContactUS = Loadable(lazy(() => import('pages/contact-us')));
+// const AppContactUS = Loadable(lazy(() => import('pages/contact-us')));
 
 // render - sample page
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
@@ -123,13 +123,23 @@ const MainRoutes = {
     {
       path: '/',
       element: (
-        <AuthGuard>
+        // <AuthGuard>
           <MainLayout />
-        </AuthGuard>
+        // </AuthGuard>
       ),
       children: [
+        // {
+        //   path: '/',
+        //   element: <CommonLayout layout="simple" />,
+        //   children: [
+        //     {
+        //       path: 'contact-us',
+        //       element: <AppContactUS />
+        //     }
+        //   ]
+        // },
         {
-          path: 'solicitud-mantenimiento',
+          path: '/solicitud-mantenimiento',
           element: <MaintenanceRequest/>
         },
         {
@@ -546,16 +556,6 @@ const MainRoutes = {
         }
       ]
     },
-    {
-      path: '/',
-      element: <CommonLayout layout="simple" />,
-      children: [
-        {
-          path: 'contact-us',
-          element: <AppContactUS />
-        }
-      ]
-    }
   ]
 };
 

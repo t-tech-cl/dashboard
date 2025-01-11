@@ -1,10 +1,10 @@
 // import { useMemo } from 'react';
 
 // material-ui
-import { Box, useMediaQuery } from '@mui/material';
+import { Box, Grid, useMediaQuery } from '@mui/material';
 
 // project import
-import Search from './Search';
+// import Search from './Search';
 // import Message from './Message';
 import Profile from './Profile';
 // import Localization from './Localization';
@@ -33,9 +33,9 @@ const HeaderContent = () => {
   // const megaMenu = useMemo(() => <MegaMenuSection />, []);
 
   return (
-    <>
+    <Grid container sx={{ justifyContent: 'flex-end' }}>
       {menuOrientation === MenuOrientation.HORIZONTAL && !downLG && <DrawerHeader open={true} />}
-      {!downLG && <Search />}
+      {/* {!downLG && <Search />} */}
       {/* {!downLG && megaMenu} */}
       {/* {!downLG && localization} */}
       {downLG && <Box sx={{ width: '100%', ml: 1 }} />}
@@ -45,7 +45,7 @@ const HeaderContent = () => {
       <Customization />
       {!downLG && <Profile />}
       {downLG && <MobileSection />}
-    </>
+    </Grid>
   );
 };
 
