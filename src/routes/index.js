@@ -3,7 +3,7 @@ import { useRoutes } from 'react-router-dom';
 // project import
 import CommonLayout from 'layout/CommonLayout';
 import ComponentsRoutes from './ComponentsRoutes';
-// import LoginRoutes from './LoginRoutes';
+import LoginRoutes from './LoginRoutes';
 import MainRoutes from './MainRoutes';
 
 // render - landing page
@@ -16,7 +16,7 @@ export default function ThemeRoutes() {
       path: '/',
       element: <CommonLayout layout="landing" />,
     },
-    // LoginRoutes,
+    LoginRoutes,
     ComponentsRoutes,
     MainRoutes
   ]);

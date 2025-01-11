@@ -36,6 +36,8 @@ const DrawerHeader = ({ open }) => {
           display: 'flex',
           flexDirection: 'row',
           rowGap: '10px',
+          columnGap: '10px',
+          alignItems: 'center'
         }}
       >
         <Logo isIcon sx={{ width: 35, height: 35 }} />

@@ -1,6 +1,7 @@
 import { Alert, Button, Grid, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import { Box, Container } from "@mui/system"
 import { useState } from "react";
+import AuthCard from "sections/auth/AuthCard";
 
 const MaintenanceRequestStepperHorizontal = ({ steps }) => {
   const [activeStep, setActiveStep] = useState(0)
@@ -32,18 +33,22 @@ const MaintenanceRequestStepperHorizontal = ({ steps }) => {
           </Box>
         </>
       ) : (
-        <Grid container alignItems="center" justifyContent="center" flexDirection="column" marginTop={4}>
-          <Grid container maxWidth={500} flexDirection="column" rowGap={2} alignItems="flex-end">
-            <Typography>{step.description}</Typography>
-            <Grid flexDirection="row" columnGap={4}>
-              <Button disabled={activeStep === 0} onClick={handleStepBack} sx={{ mr: 1 }}>
-                Regresar
-              </Button>
-              <Button onClick={handleNextStep} variant="contained" color={activeStep === steps.length - 1 ? 'success' : 'primary'}>
-                {activeStep === steps.length - 1 ? 'Enviar solicitud' : 'Siguiente'}
-              </Button>
+        <Grid container alignItems="center" justifyContent="center">
+          <AuthCard>
+            <Grid container alignItems="center" justifyContent="center" flexDirection="column">
+              <Grid container maxWidth={500} flexDirection="column" rowGap={2} alignItems="flex-end">
+                <Typography>{step.description}</Typography>
+                <Grid flexDirection="row" columnGap={4}>
+                  <Button disabled={activeStep === 0} onClick={handleStepBack} sx={{ mr: 1 }}>
+                    Regresar
+                  </Button>
+                  <Button onClick={handleNextStep} variant="contained" color={activeStep === steps.length - 1 ? 'success' : 'primary'}>
+                    {activeStep === steps.length - 1 ? 'Enviar solicitud' : 'Siguiente'}
+                  </Button>
+                </Grid>
+              </Grid>
             </Grid>
-          </Grid>
+          </AuthCard>
         </Grid>
       )}
     </Container>

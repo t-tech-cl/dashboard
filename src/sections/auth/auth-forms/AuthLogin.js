@@ -81,7 +81,7 @@ const AuthLogin = ({ isDemo = false }) => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="email-login">Email Address</InputLabel>
+                  <InputLabel htmlFor="email-login">Correo electrónico</InputLabel>
                   <OutlinedInput
                     id="email-login"
                     type="email"
@@ -89,7 +89,7 @@ const AuthLogin = ({ isDemo = false }) => {
                     name="email"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    placeholder="Enter email address"
+                    placeholder="Ingresa tu correo electrónico"
                     fullWidth
                     error={Boolean(touched.email && errors.email)}
                   />
@@ -102,7 +102,7 @@ const AuthLogin = ({ isDemo = false }) => {
               </Grid>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="password-login">Password</InputLabel>
+                  <InputLabel htmlFor="password-login">Contraseña</InputLabel>
                   <OutlinedInput
                     fullWidth
                     error={Boolean(touched.password && errors.password)}
@@ -125,7 +125,7 @@ const AuthLogin = ({ isDemo = false }) => {
                         </IconButton>
                       </InputAdornment>
                     }
-                    placeholder="Enter password"
+                    placeholder="Ingresa tu contraseña"
                   />
                   {touched.password && errors.password && (
                     <FormHelperText error id="standard-weight-helper-text-password-login">
@@ -147,10 +147,10 @@ const AuthLogin = ({ isDemo = false }) => {
                         size="small"
                       />
                     }
-                    label={<Typography variant="h6">Keep me sign in</Typography>}
+                    label={<Typography variant="h6">Mantener sesión iniciada</Typography>}
                   />
                   <Link variant="h6" component={RouterLink} to={isDemo ? '/auth/forgot-password' : '/forgot-password'} color="text.primary">
-                    Forgot Password?
+                    ¿Olvidaste tu contraseña?
                   </Link>
                 </Stack>
               </Grid>
@@ -162,7 +162,7 @@ const AuthLogin = ({ isDemo = false }) => {
               <Grid item xs={12}>
                 <AnimateButton>
                   <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                    Login
+                    Iniciar sesión
                   </Button>
                 </AnimateButton>
               </Grid>

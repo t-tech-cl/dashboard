@@ -38,7 +38,13 @@ const MainLayout = () => {
   }, [matchDownXL]);
 
   return (
-    <Box sx={{ display: 'flex', width: '100%' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        backgroundImage: `url("https://www.torrestech.cl/assets/css/images/overlay.png"), url("https://www.torrestech.cl/images/banner.jpg")`,
+      }}
+    >
       <Header />
       {!isHorizontal ? <Drawer /> : <HorizontalBar />}
       <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
