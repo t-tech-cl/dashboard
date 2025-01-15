@@ -23,6 +23,14 @@ export const ThemeDirection = {
   RTL: 'rtl'
 };
 
+export const databaseConfig = {
+  // Database
+  host: process.env.DATABASE_HOST,
+  password: process.env.DATABASE_PASSWORD,
+  name: process.env.DATABASE_DBNAME,
+  username: process.env.DATABASE_USERNAME,
+}
+
 // ==============================|| THEME CONFIG  ||============================== //
 
 const config = {

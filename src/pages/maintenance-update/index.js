@@ -1,9 +1,7 @@
-import { Typography } from "@mui/material"
+import MaintenanceUpdateComponent from "components/maintenance-update"
 
 const MaintenanceUpdate = () => {
-  return (
-    <Typography variant="h3">MaintenanceUpdate</Typography>
-  )
+  return <MaintenanceUpdateComponent/>
 }
 
 export default MaintenanceUpdate

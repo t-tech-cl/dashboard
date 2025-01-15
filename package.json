@@ -6,6 +6,7 @@
     "@ant-design/colors": "^7.0.0",
     "@ant-design/icons": "^5.0.1",
     "@auth0/auth0-spa-js": "^2.0.4",
+    "@babel/preset-react": "^7.26.3",
     "@date-io/date-fns": "^2.16.0",
     "@date-io/dayjs": "^2.16.0",
     "@date-io/luxon": "^2.16.1",
@@ -56,6 +57,7 @@
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.1",
     "moment": "^2.30.1",
+    "next": "^15.1.4",
     "notistack": "^3.0.1",
     "process": "^0.11.10",
     "prop-types": "^15.8.1",
@@ -142,8 +144,10 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.21.4",
-    "@babel/eslint-parser": "^7.21.3",
+    "@babel/cli": "^7.26.4",
+    "@babel/core": "^7.26.0",
+    "@babel/eslint-parser": "^7.26.5",
+    "@babel/preset-env": "^7.26.0",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-react-app": "^7.0.1",

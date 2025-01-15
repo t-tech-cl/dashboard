@@ -4,7 +4,7 @@ import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 // project import
-import chat from './chat';
+import maintenanceRequest from './maintenanceRequest';
 import calendar from './calendar';
 import menu from './menu';
 import snackbar from './snackbar';
@@ -16,7 +16,7 @@ import invoice from './invoice';
 // ==============================|| COMBINE REDUCERS ||============================== //
 
 const reducers = combineReducers({
-  chat,
+  maintenanceRequest,
   calendar,
   menu,
   snackbar,

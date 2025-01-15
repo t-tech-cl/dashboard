@@ -1,9 +1,7 @@
-import MaintenanceRequestStepper from "components/maintenance-request-stepper"
+import MaintenanceRequestStepper from 'components/maintenance-request-stepper';
 
 const MaintenanceRequest = () => {
-  return (
-    <MaintenanceRequestStepper/>
-  )
-}
+  return <MaintenanceRequestStepper />;
+};
 
-export default MaintenanceRequest
+export default MaintenanceRequest;

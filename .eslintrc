@@ -31,6 +31,13 @@
   },
   "parser": "@babel/eslint-parser",
   "parserOptions": {
+    "babelOptions": {
+      "babelrc": true,
+      "parserOpts": {
+        "plugins": ["jsx"]
+      }
+   },
+    "requireConfigFile": false,
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true,
       "impliedStrict": true,
@@ -47,7 +54,7 @@
     "react/display-name": "off",
     "react/jsx-filename-extension": "off",
     "no-param-reassign": "off",
-    "react/prop-types": 1,
+    "react/prop-types": 0,
     "react/require-default-props": "off",
     "react/no-array-index-key": "off",
     "react/jsx-props-no-spreading": "off",

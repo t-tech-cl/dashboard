@@ -1,16 +1,16 @@
-import { Alert, Button, Grid, Step, StepLabel, Stepper, Typography } from "@mui/material";
-import { Box, Container } from "@mui/system"
-import { useState } from "react";
-import AuthCard from "sections/auth/AuthCard";
+import { Alert, Button, Grid, Step, StepLabel, Stepper, Typography } from '@mui/material';
+import { Box, Container } from '@mui/system';
+import { useState } from 'react';
+import AuthCard from 'sections/auth/AuthCard';
 
 const MaintenanceRequestStepperHorizontal = ({ steps }) => {
-  const [activeStep, setActiveStep] = useState(0)
+  const [activeStep, setActiveStep] = useState(0);
 
-  const handleStepBack = () => setActiveStep(activeStep - 1)
-  const handleNextStep = () => setActiveStep(activeStep + 1)
-  
-  const step = steps[activeStep]
-  
+  const handleStepBack = () => setActiveStep(activeStep - 1);
+  const handleNextStep = () => setActiveStep(activeStep + 1);
+
+  const step = steps[activeStep];
+
   return (
     <Container>
       <Stepper activeStep={activeStep} alternativeLabel>
@@ -52,7 +52,7 @@ const MaintenanceRequestStepperHorizontal = ({ steps }) => {
         </Grid>
       )}
     </Container>
-  )
-}
+  );
+};
 
-export default MaintenanceRequestStepperHorizontal
+export default MaintenanceRequestStepperHorizontal;

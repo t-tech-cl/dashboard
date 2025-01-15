@@ -21,7 +21,7 @@ const initialState = {
 export const fetchMenu = createAsyncThunk('', async () => {
   // const response = await axios.get('/api/menu/dashboard');
   // return response.data;
-  return other
+  return other;
 });
 
 const menu = createSlice({
@@ -55,7 +55,7 @@ const menu = createSlice({
 
   extraReducers(state) {
     // builder.addCase(fetchMenu.fulfilled, (state, action) => {
-      state.menu = other;
+    state.menu = other;
     // });
   }
 });

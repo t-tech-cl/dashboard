@@ -7,6 +7,7 @@ import { motion, useCycle } from 'framer-motion';
 
 export default function AnimateButton({
   children,
+  style,
   type = 'scale',
   direction = 'right',
   offset = 10,
@@ -38,6 +39,7 @@ export default function AnimateButton({
     case 'rotate':
       return (
         <motion.div
+          style={style}
           animate={{ rotate: 360 }}
           transition={{
             repeat: Infinity,
@@ -52,13 +54,13 @@ export default function AnimateButton({
     case 'slide':
       if (direction === 'up' || direction === 'down') {
         return (
-          <motion.div animate={{ y: y !== undefined ? y : '' }} onHoverEnd={() => cycleY()} onHoverStart={() => cycleY()}>
+          <motion.div style={style} animate={{ y: y !== undefined ? y : '' }} onHoverEnd={() => cycleY()} onHoverStart={() => cycleY()}>
             {children}
           </motion.div>
         );
       }
       return (
-        <motion.div animate={{ x: x !== undefined ? x : '' }} onHoverEnd={() => cycleX()} onHoverStart={() => cycleX()}>
+        <motion.div style={style} animate={{ x: x !== undefined ? x : '' }} onHoverEnd={() => cycleX()} onHoverStart={() => cycleX()}>
           {children}
         </motion.div>
       );
@@ -72,7 +74,7 @@ export default function AnimateButton({
         };
       }
       return (
-        <motion.div whileHover={{ scale: scale?.hover }} whileTap={{ scale: scale?.tap }}>
+        <motion.div style={style} whileHover={{ scale: scale?.hover }} whileTap={{ scale: scale?.tap }}>
           {children}
         </motion.div>
       );
