@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import { createContext, useEffect, useReducer } from 'react';
+import SHA256 from 'crypto-js/sha256';
 
 // third-party
-import { Chance } from 'chance';
 import jwtDecode from 'jwt-decode';
 
 // reducer - state management
@@ -12,8 +12,7 @@ import authReducer from 'store/reducers/auth';
 // project import
 import Loader from 'components/Loader';
 import axios from 'utils/axios';
-
-const chance = new Chance();
+import { ACCOUNT_ENDPOINTS } from 'const/urls';
 
 // constant
 const initialState = {
@@ -45,9 +44,9 @@ const setSession = (serviceToken) => {
 
 // ==============================|| JWT CONTEXT & PROVIDER ||============================== //
 
-const JWTContext = createContext(null);
+const AuthContext = createContext(null);
 
-export const JWTProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
@@ -82,9 +81,10 @@ export const JWTProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const response = await axios.post('/api/account/login', { email, password });
-    const { serviceToken, user } = response.data;
-    setSession(serviceToken);
+    const encryptedPass = SHA256(password).toString();
+    const response = await axios.post(ACCOUNT_ENDPOINTS.LOGIN, { email, password: encryptedPass });
+    const { token, user } = response.data;
+    setSession(token);
     dispatch({
       type: LOGIN,
       payload: {
@@ -96,9 +96,7 @@ export const JWTProvider = ({ children }) => {
 
   const register = async (email, password, firstName, lastName) => {
     // todo: this flow need to be recode as it not verified
-    const id = chance.bb_pin();
-    const response = await axios.post('/api/account/register', {
-      id,
+    const response = await axios.post(ACCOUNT_ENDPOINTS.REGISTER, {
       email,
       password,
       firstName,
@@ -111,7 +109,6 @@ export const JWTProvider = ({ children }) => {
       users = [
         ...JSON.parse(localUsers),
         {
-          id,
           email,
           password,
           name: `${firstName} ${lastName}`
@@ -135,11 +132,13 @@ export const JWTProvider = ({ children }) => {
     return <Loader />;
   }
 
-  return <JWTContext.Provider value={{ ...state, login, logout, register, resetPassword, updateProfile }}>{children}</JWTContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ ...state, login, logout, register, resetPassword, updateProfile }}>{children}</AuthContext.Provider>
+  );
 };
 
-JWTProvider.propTypes = {
+AuthProvider.propTypes = {
   children: PropTypes.node
 };
 
-export default JWTContext;
+export default AuthContext;
