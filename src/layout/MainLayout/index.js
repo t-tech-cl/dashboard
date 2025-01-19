@@ -17,6 +17,7 @@ import { MenuOrientation } from 'config';
 import useConfig from 'hooks/useConfig';
 import { dispatch } from 'store';
 import { openDrawer } from 'store/reducers/menu';
+import ScrollIndicator from 'components/scrollIndicator';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
@@ -43,23 +44,30 @@ const MainLayout = () => {
         display: 'flex',
         width: '100%',
         backgroundImage: `url("https://www.torrestech.cl/assets/css/images/overlay.png"), url("https://www.torrestech.cl/images/banner.jpg")`,
+        backgroundAttachment: 'fixed',
+        backgroundSize: 'cover'
       }}
     >
       <Header />
       {!isHorizontal ? <Drawer /> : <HorizontalBar />}
-      <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+      <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1 }}>
         <Toolbar sx={{ mt: isHorizontal ? 8 : 'inherit' }} />
+        <ScrollIndicator />
         <Container
           maxWidth={container ? 'xl' : false}
           sx={{
-            ...(container && { px: { xs: 0, sm: 2 } }),
+            ...(container && { px: { xs: 2, sm: 5 } }),
             position: 'relative',
             minHeight: 'calc(100vh - 110px)',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            scrollSnapType: 'y mandatory',
+            height: '100vh',
+            overflowY: 'scroll'
           }}
         >
           {/* <Breadcrumbs navigation={navigation} title titleBottom card={false} divider={false} /> */}
+
           <Outlet />
           {/* <Footer /> */}
         </Container>

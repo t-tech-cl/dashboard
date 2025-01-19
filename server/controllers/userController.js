@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 // Create a new user
@@ -52,21 +53,27 @@ export const loginUser = async (req, res) => {
     }
 
     // Generate JWT token (expires in 1 hour)
-    // const token = jwtDecode.sign(
-    //   {
-    //     userId: user.UserID,
-    //     email: user.Email,
-    //     role: user.Role
-    //   },
-    //   JWT_SECRET,
-    //   { expiresIn: '1h' }
-    // );
+    const token = jwt.sign(
+      {
+        userId: user.userID,
+        email: user.email,
+        role: user.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
     // Return the token in the response
     return res.status(200).json({
       message: 'Login successful',
-      // token, // Send token to client
-      user
+      token, // Send token to client
+      user: {
+        userID: user.userID,
+        email: user.email,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        role: user.role
+      }
     });
   } catch (error) {
     console.error('Error logging in user:', error);

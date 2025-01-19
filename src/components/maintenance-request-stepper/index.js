@@ -5,11 +5,16 @@ import ApplicantRequestReception from 'components/forms/maintenance-request/rece
 import ApplicantRequestForm from 'components/forms/maintenance-request/request';
 import MaintenanceRequestStepperHorizontal from 'components/maintenance-request-stepper/horizontal';
 import MaintenanceRequestStepperVertical from 'components/maintenance-request-stepper/vertical';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
-import { updateRequest } from 'store/reducers/maintenanceRequest';
+import { getLastRequest, updateRequest } from 'store/reducers/maintenanceRequest';
 
 const MaintenanceRequestStepper = () => {
+  useEffect(() => {
+    const getLastReqNumber = async () => await getLastRequest();
+    getLastReqNumber();
+  }, []);
+
   const steps = [
     { label: 'Solicitante', description: <ApplicantForm onNext={(form) => updateRequest({ form })} /> },
     { label: 'Solicitud', description: <ApplicantRequestForm /> },

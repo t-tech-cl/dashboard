@@ -1,21 +1,43 @@
-import { Grid, InputLabel, TextField, Typography } from '@mui/material';
-import React from 'react';
+import { Button, Grid, InputLabel, TextField, Typography } from '@mui/material';
+import React, { useEffect } from 'react';
 import { Field, Form } from 'react-final-form';
-// import { updateRequest } from 'store/reducers/maintenanceRequest'
+import { useDispatch, useSelector } from 'react-redux';
+import { getLastRequest, updateRequest } from 'store/reducers/maintenanceRequest';
 
-const ApplicantForm = ({ onSubmit, onNext }) => {
-  const handleOnSubmit = async (form) => {
+const ApplicantForm = ({ onSubmit }) => {
+  const dispatch = useDispatch();
+
+  const {
+    maintenanceRequest: { requestNumber, applicant }
+  } = useSelector((state) => state);
+  console.log(applicant);
+
+  useEffect(() => {
+    const getData = async () => await getLastRequest();
+    !requestNumber && getData();
+  }, [requestNumber]);
+
+  const initialValues = {
+    requestNumber,
+    name: applicant?.name || '',
+    role: applicant?.role || '',
+    area: applicant?.area || '',
+    signature: applicant?.signature || ''
+  };
+
+  const handleOnSubmit = async ({ requestNumber, ...applicant }) => {
+    await dispatch(updateRequest({ requestNumber, applicant }));
     onSubmit?.();
-    console.log(form);
   };
 
   return (
     <Form
       onSubmit={handleOnSubmit}
+      initialValues={initialValues}
       render={({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} id="xx">
           <Grid container rowGap={2}>
-            <Typography variant="h3" textAlign="center">
+            <Typography variant="h3" textAlign="center" sx={{ typography: { md: 'h1' } }}>
               Ingresa numero de Solicitud y datos del solicitante:
             </Typography>
             <Field
@@ -24,13 +46,22 @@ const ApplicantForm = ({ onSubmit, onNext }) => {
               render={({ input }) => (
                 <Grid container flexDirection="column" rowGap={1}>
                   <InputLabel>N° de Solicitud:</InputLabel>
-                  <TextField {...input} variant="outlined" />
+                  <TextField
+                    {...input}
+                    variant="outlined"
+                    disabled
+                    sx={{
+                      '& .MuiInputBase-input.Mui-disabled': {
+                        WebkitTextFillColor: '#ffffff70'
+                      }
+                    }}
+                  />
                 </Grid>
               )}
             />
             <Field
-              id="applicantName"
-              name="applicantName"
+              id="name"
+              name="name"
               render={({ input }) => (
                 <Grid container flexDirection="column" rowGap={1}>
                   <InputLabel>Nombre:</InputLabel>
@@ -39,8 +70,8 @@ const ApplicantForm = ({ onSubmit, onNext }) => {
               )}
             />
             <Field
-              id="applicantRole"
-              name="applicantRole"
+              id="role"
+              name="role"
               render={({ input }) => (
                 <Grid container flexDirection="column" rowGap={1}>
                   <InputLabel>Cargo:</InputLabel>
@@ -49,8 +80,8 @@ const ApplicantForm = ({ onSubmit, onNext }) => {
               )}
             />
             <Field
-              id="applicantArea"
-              name="applicantArea"
+              id="area"
+              name="area"
               render={({ input }) => (
                 <Grid container flexDirection="column" rowGap={1}>
                   <InputLabel>Área:</InputLabel>
@@ -59,8 +90,8 @@ const ApplicantForm = ({ onSubmit, onNext }) => {
               )}
             />
             <Field
-              id="applicantSignature"
-              name="applicantSignature"
+              id="signature"
+              name="signature"
               render={({ input }) => (
                 <Grid container flexDirection="column" rowGap={1}>
                   <InputLabel>Firma:</InputLabel>
@@ -68,8 +99,11 @@ const ApplicantForm = ({ onSubmit, onNext }) => {
                 </Grid>
               )}
             />
-            {/* Pass the form object to the parent */}
-            {onNext && onNext(values)}
+            <Grid flexDirection="row" columnGap={4}>
+              <Button onClick={() => handleOnSubmit(values)} variant="contained" color="primary">
+                Siguiente
+              </Button>
+            </Grid>
           </Grid>
         </form>
       )}

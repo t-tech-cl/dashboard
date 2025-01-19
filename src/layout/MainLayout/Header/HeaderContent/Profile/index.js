@@ -18,7 +18,7 @@ import { ThemeMode } from 'config';
 import useAuth from 'hooks/useAuth';
 
 // assets
-import avatar1 from 'assets/images/users/avatar-1.png';
+import avatar from 'assets/images/users/avatar.png';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 
 // tab panel wrapper
@@ -104,8 +104,8 @@ const Profile = () => {
         onClick={handleToggle}
       >
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
-          <Avatar alt="profile user" src={avatar1} size="xs" />
-          <Typography variant="subtitle1">{user?.name}</Typography>
+          <Avatar alt="profile user" src={avatar} size="xs" />
+          <Typography variant="subtitle1">{`${user?.firstname} ${user?.lastname}`}</Typography>
         </Stack>
       </ButtonBase>
       <Popper
@@ -145,11 +145,11 @@ const Profile = () => {
                     <Grid container justifyContent="space-between" alignItems="center">
                       <Grid item>
                         <Stack direction="row" spacing={1.25} alignItems="center">
-                          <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
+                          <Avatar alt="profile user" src={avatar} sx={{ width: 32, height: 32 }} />
                           <Stack>
-                            <Typography variant="h6">{user?.name}</Typography>
+                            <Typography variant="h6">{`${user?.firstname} ${user?.lastname}`}</Typography>
                             <Typography variant="body2" color="textSecondary">
-                              UI/UX Designer
+                              {user?.role}
                             </Typography>
                           </Stack>
                         </Stack>

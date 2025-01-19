@@ -52,6 +52,17 @@ CREATE TABLE RequestEvaluations (
     FOREIGN KEY (assignedTo) REFERENCES Users(userID) ON DELETE SET NULL
 );
 
+CREATE TABLE ExternalCompanyReports (
+    reportID INT AUTO_INCREMENT PRIMARY KEY,
+    requestID INT NOT NULL, -- Link to the corresponding request
+    reportDate DATE NOT NULL, -- Fecha
+    description TEXT NOT NULL, -- Descripción
+    assignedTo VARCHAR(50), -- Deriva a (linked request number or external assignee)
+    reason VARCHAR(255), -- Motivo
+    observations TEXT, -- Observaciones
+    FOREIGN KEY (requestID) REFERENCES Requests(requestID) ON DELETE CASCADE
+);
+
 -- Insert your user
 INSERT INTO Users (email, firstname, lastname, password, role)
 VALUES (
@@ -75,3 +86,7 @@ VALUES
     ('REQ001', 2, '2025-01-01', 'Broken conveyor belt', 'Production Line', 'ConveyorMaster', 'Plant A', 'SN001', 3, 'Urgent replacement', 'Requires expedited repair', 1, '2025-01-02', 'Clean and ready for repair'),
     ('REQ002', 3, '2025-01-05', 'Leaking pipe', 'Boiler Room', 'PipePro', 'Plant B', 'SN002', 2, 'Routine maintenance', 'Observed rust accumulation', 0, NULL, 'Area needs cleaning first'),
     ('REQ003', 4, '2025-01-10', 'Faulty motor', 'Assembly Area', 'MotorWorks', 'Plant C', 'SN003', 2, 'Warranty issue', 'Inspect for warranty claim', NULL, NULL, NULL);
+
+INSERT INTO ExternalCompanyReports (requestID, reportDate, description, assignedTo, reason, observations)
+VALUES 
+    (1, '2025-01-17', 'Inspection report from external company.', 'REQ004', 'Urgent repair needed', 'Follow-up required after part replacement.');

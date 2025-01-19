@@ -17,7 +17,8 @@ import componentsOverride from './overrides';
 export default function ThemeCustomization({ children }) {
   const { themeDirection, mode, presetColor, fontFamily } = useConfig();
 
-  const theme = useMemo(() => Palette(mode, presetColor), [mode, presetColor]);
+  let theme = useMemo(() => Palette(mode, presetColor), [mode, presetColor]);
+  // theme = responsiveFontSizes(theme);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const themeTypography = useMemo(() => Typography(fontFamily), [fontFamily]);
