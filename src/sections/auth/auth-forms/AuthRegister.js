@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 
 // material-ui
 import {
@@ -39,6 +39,7 @@ const AuthRegister = () => {
   const { register } = useAuth();
   const scriptedRef = useScriptRef();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [level, setLevel] = useState();
   const [showPassword, setShowPassword] = useState(false);
@@ -78,26 +79,26 @@ const AuthRegister = () => {
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
-            await register(values.email, values.password, values.firstname, values.lastname);
-            if (scriptedRef.current) {
-              setStatus({ success: true });
-              setSubmitting(false);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: 'Your registration has been successfully completed.',
-                  variant: 'alert',
-                  alert: {
-                    color: 'success'
-                  },
-                  close: false
-                })
-              );
+            const queryParams = new URLSearchParams(location.search);
+            await register(values.email, values.password, values.firstname, values.lastname, queryParams);
+            // if (scriptedRef.current) {
+            setStatus({ success: true });
+            setSubmitting(false);
+            dispatch(
+              openSnackbar({
+                open: true,
+                message: 'Your registration has been successfully completed.',
+                variant: 'alert',
+                alert: {
+                  color: 'success'
+                },
+                close: false
+              })
+            );
 
-              setTimeout(() => {
-                navigate('/login', { replace: true });
-              }, 1500);
-            }
+            setTimeout(() => {
+              navigate('/login', { replace: true });
+            }, 1500);
           } catch (err) {
             console.error(err);
             if (scriptedRef.current) {

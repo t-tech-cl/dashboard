@@ -38,10 +38,11 @@ export default maintenanceRequest.reducer;
 
 export const updateRequest = async (payload) => {
   try {
-    const response = await axiosServices.post(REQUESTS_ENDPOINTS.CREATE_REQUEST, { body: payload });
+    const response = await axiosServices.post(REQUESTS_ENDPOINTS.CREATE_REQUEST, { ...payload });
     if (response.status === 200) {
       dispatch(maintenanceRequest.actions.updateRequest(payload));
     }
+    return response;
   } catch (error) {
     console.log(error);
   }

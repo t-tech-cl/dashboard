@@ -26,9 +26,6 @@ const verifyToken = (serviceToken) => {
     return false;
   }
   const decoded = jwtDecode(serviceToken);
-  /**
-   * Property 'exp' does not exist on type '<T = unknown>(token: string, options?: JwtDecodeOptions | undefined) => T'.
-   */
   return decoded.exp > Date.now() / 1000;
 };
 
@@ -55,8 +52,7 @@ export const AuthProvider = ({ children }) => {
         const serviceToken = window.localStorage.getItem('serviceToken');
         if (serviceToken && verifyToken(serviceToken)) {
           setSession(serviceToken);
-          const response = await axios.get('/api/account/me');
-          const { user } = response.data;
+          const user = jwtDecode(serviceToken);
           dispatch({
             type: LOGIN,
             payload: {
@@ -94,27 +90,20 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const register = async (email, password, firstName, lastName) => {
+  const register = async (email, password, firstname, lastname, queryParams) => {
     // todo: this flow need to be recode as it not verified
-    const response = await axios.post(ACCOUNT_ENDPOINTS.REGISTER, {
-      email,
-      password,
-      firstName,
-      lastName
-    });
+    const role = queryParams.get('role');
+    const response = await axios.post(
+      ACCOUNT_ENDPOINTS.REGISTER,
+      {
+        email,
+        password,
+        firstname,
+        lastname
+      },
+      { params: { role } }
+    );
     let users = response.data;
-
-    if (window.localStorage.getItem('users') !== undefined && window.localStorage.getItem('users') !== null) {
-      const localUsers = window.localStorage.getItem('users');
-      users = [
-        ...JSON.parse(localUsers),
-        {
-          email,
-          password,
-          name: `${firstName} ${lastName}`
-        }
-      ];
-    }
 
     window.localStorage.setItem('users', JSON.stringify(users));
   };

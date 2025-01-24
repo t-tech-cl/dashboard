@@ -30,7 +30,7 @@ const ApplicantRequestReceptionSection = ({ form }) => {
             <FormControl component="fieldset">
               <RadioGroup {...input} name="radio-buttons-group" row defaultValue="si">
                 <Grid flexDirection="column" columnGap={2}>
-                  <FormControlLabel value="si" control={<Radio />} label="Si" />
+                  <FormControlLabel value="si" control={<Radio checked />} label="Si" />
                   <FormControlLabel value="no" control={<Radio />} label="No" />
                 </Grid>
               </RadioGroup>

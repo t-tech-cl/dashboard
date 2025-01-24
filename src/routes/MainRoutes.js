@@ -4,9 +4,10 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
-// import AuthGuard from 'utils/route-guard/AuthGuard';
+import AuthGuard from 'utils/route-guard/AuthGuard';
 import MaintenanceRequest from 'pages/maintenance-request';
 import MaintenanceUpdate from 'pages/maintenance-update';
+import MaintenanceRequestPDF from 'pages/maintenance-pdf';
 
 // render - dashboard
 // const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
@@ -124,9 +125,9 @@ const MainRoutes = {
     {
       path: '/',
       element: (
-        // <AuthGuard>
+        <AuthGuard>
           <MainLayout />
-        // </AuthGuard>
+        </AuthGuard>
       ),
       children: [
         // {
@@ -141,11 +142,15 @@ const MainRoutes = {
         // },
         {
           path: '/mantenimiento/solicitud',
-          element: <MaintenanceRequest/>
+          element: <MaintenanceRequest />
         },
         {
           path: '/mantenimiento/actualizacion',
-          element: <MaintenanceUpdate/>
+          element: <MaintenanceUpdate />
+        },
+        {
+          path: '/mantenimiento/pdf-solicitud',
+          element: <MaintenanceRequestPDF />
         },
         // {
         //   path: 'dashboard',
@@ -502,7 +507,7 @@ const MainRoutes = {
         {
           path: 'sample-page',
           element: <SamplePage />
-        },
+        }
         // {
         //   path: 'pricing',
         //   element: <PricingPage />
@@ -560,7 +565,7 @@ const MainRoutes = {
           element: <AuthCodeVerification />
         }
       ]
-    },
+    }
   ]
 };
 

@@ -4,7 +4,8 @@ import User from '../models/User.js';
 
 // Create a new user
 export const createUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, firstname, lastname, password } = req.body;
+  const { role } = req.query;
 
   // Hash the password using bcrypt
   const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
@@ -12,14 +13,17 @@ export const createUser = async (req, res) => {
   try {
     const user = await User.create({
       password: hashedPassword, // Use a hashed password in production
-      role: 'User',
+      role: role || 'User',
+      firstname,
+      lastname,
       email
     });
 
     console.log('New user created:', user);
+    return res.status(200).json({ user });
   } catch (error) {
     console.error('Error creating user:', error);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -55,9 +59,11 @@ export const loginUser = async (req, res) => {
     // Generate JWT token (expires in 1 hour)
     const token = jwt.sign(
       {
-        userId: user.userID,
+        userID: user.userID,
         email: user.email,
-        role: user.role
+        role: user.role,
+        firstname: user.firstname,
+        lastname: user.lastname
       },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }

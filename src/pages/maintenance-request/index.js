@@ -1,4 +1,4 @@
-import { Button, Grid } from '@mui/material';
+import { Button, Grid, Step, StepLabel, Stepper } from '@mui/material';
 import Card from 'components/card';
 import ScrollableSection from 'components/scrollableSection';
 import ApplicantSection from 'components/sections/applicant';
@@ -6,20 +6,21 @@ import ApplicantEvaluationSection from 'components/sections/evaluation';
 import ApplicantExternalReportSection from 'components/sections/external-report';
 import ApplicantRequestReceptionSection from 'components/sections/reception';
 import ApplicantRequestSection from 'components/sections/request';
-import { useEffect, useRef } from 'react';
+import AuthContext from 'contexts/AuthContext';
+import { useContext, useEffect, useRef } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { getLastRequest, updateRequest } from 'store/reducers/maintenanceRequest';
+import { openSnackbar } from 'store/reducers/snackbar';
 
 const LongForm = () => {
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
 
-  const {
-    maintenanceRequest: { requestNumber, applicant },
-    user
-  } = useSelector((state) => state);
-  console.log({ user });
+  const { user } = useContext(AuthContext);
+
+  const { requestNumber, applicant } = useSelector((state) => state.maintenanceRequest);
+
   const initialValues = {
     userID: user?.userID,
     requestNumber,
@@ -34,8 +35,37 @@ const LongForm = () => {
   }, [requestNumber]);
 
   const handleOnSubmit = async (values) => {
-    console.log(values);
-    await dispatch(updateRequest(values));
+    const payload = { ...values, userID: user?.userID };
+    try {
+      const response = await dispatch(updateRequest(payload));
+
+      if (response.status === 200) {
+        dispatch(
+          openSnackbar({
+            open: true,
+            message: 'La solicitud ha sido guardada',
+            variant: 'alert',
+            alert: {
+              color: 'success'
+            },
+            close: false
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Ocurrio un problema al intentar guardar la solicitud',
+          variant: 'alert',
+          alert: {
+            color: 'error'
+          },
+          close: false
+        })
+      );
+    }
   };
 
   // Scroll to the next section
@@ -118,14 +148,25 @@ const LongForm = () => {
       render={({ handleSubmit, form, values }) => (
         <form onSubmit={handleSubmit} id="xx">
           {forms.map((Component, index) => (
-            <ScrollableSection
-              key={index}
-              index={index}
-              ref={(el) => (sectionRefs.current[index] = el)}
-              onComplete={index < 3 ? () => scrollToSection(index + 1) : null} // Automatically go to next section
-            >
-              <Component form={form} values={values} initialValues={initialValues} onSubmit={handleOnSubmit} />
-            </ScrollableSection>
+            <>
+              <Stepper activeStep={0} alternativeLabel>
+                {[{ label: 'Label' }].map((item, index) => {
+                  return (
+                    <Step key={index}>
+                      <StepLabel>{item.label}</StepLabel>
+                    </Step>
+                  );
+                })}
+              </Stepper>
+              <ScrollableSection
+                key={index}
+                index={index}
+                ref={(el) => (sectionRefs.current[index] = el)}
+                onComplete={index < 3 ? () => scrollToSection(index + 1) : null} // Automatically go to next section
+              >
+                <Component form={form} values={values} initialValues={initialValues} onSubmit={handleOnSubmit} />
+              </ScrollableSection>
+            </>
           ))}
         </form>
       )}

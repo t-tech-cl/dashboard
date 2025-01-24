@@ -13,7 +13,8 @@ import {
   SmileOutlined,
   StopOutlined,
   FormOutlined,
-  IssuesCloseOutlined
+  IssuesCloseOutlined,
+  FilePdfOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -28,7 +29,8 @@ const icons = {
   QuestionOutlined,
   DeploymentUnitOutlined,
   FormOutlined,
-  IssuesCloseOutlined
+  IssuesCloseOutlined,
+  FilePdfOutlined
 };
 
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
@@ -52,6 +54,13 @@ const other = {
       url: '/mantenimiento/actualizacion',
       icon: icons.IssuesCloseOutlined
     },
+    {
+      id: 'maintenance-request-pdf',
+      title: 'Solicitud',
+      type: 'item',
+      url: '/mantenimiento/pdf-solicitud',
+      icon: icons.FilePdfOutlined
+    }
     // {
     //   id: 'menu-level',
     //   title: <FormattedMessage id="menu-level" />,

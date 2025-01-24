@@ -22,8 +22,8 @@ const ApplicantExternalReportSection = ({ form }) => {
         )}
       />
       <Field
-        id="description"
-        name="applicant-position"
+        id="reportDescription"
+        name="reportDescription"
         render={({ input }) => (
           <Grid container flexDirection="column" rowGap={1}>
             <InputLabel>Descripción:</InputLabel>
@@ -32,8 +32,8 @@ const ApplicantExternalReportSection = ({ form }) => {
         )}
       />
       <Field
-        id="requestNumber"
-        name="requestNumber"
+        id="reportAssignedTo"
+        name="reportAssignedTo"
         render={({ input }) => (
           <Grid container flexDirection="column" rowGap={1}>
             <InputLabel>Deriva a:</InputLabel>
@@ -42,8 +42,8 @@ const ApplicantExternalReportSection = ({ form }) => {
         )}
       />
       <Field
-        id="applicantName"
-        name="applicantName"
+        id="reportReason"
+        name="reportReason"
         render={({ input }) => (
           <Grid container flexDirection="column" rowGap={1}>
             <InputLabel>Motivo:</InputLabel>
@@ -52,8 +52,8 @@ const ApplicantExternalReportSection = ({ form }) => {
         )}
       />
       <Field
-        id="applicant-position"
-        name="applicant-position"
+        id="reportObservations"
+        name="reportObservations"
         render={({ input }) => (
           <Grid container flexDirection="column" rowGap={1}>
             <InputLabel>Observaciones:</InputLabel>

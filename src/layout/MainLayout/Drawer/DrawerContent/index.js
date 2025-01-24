@@ -13,7 +13,7 @@ const DrawerContent = () => {
   // const theme = useTheme();
   // const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
 
-  // const menu = useSelector((state) => state.menu);
+  // const menu  = useSelector((state) => state.menu);
   // const { drawerOpen } = menu;
 
   return (

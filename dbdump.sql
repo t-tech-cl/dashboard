@@ -27,7 +27,7 @@ CREATE TABLE Requests (
     brand VARCHAR(100),
     location VARCHAR(100),
     serialNumber VARCHAR(50),
-    assignedTo INT, -- Link to the user assigned to handle the request
+    assignedTo VARCHAR(50), -- Link to the user assigned to handle the request
     reason VARCHAR(255),
     managerObservations TEXT,
     isClean TINYINT(1), -- Changed to TINYINT(1) for boolean-like data
@@ -42,7 +42,7 @@ CREATE TABLE Requests (
 CREATE TABLE RequestEvaluations (
     evaluationID INT AUTO_INCREMENT PRIMARY KEY,
     requestID INT NOT NULL,
-    assignedTo INT, -- Link to the user assigned to handle the request
+    assignedTo VARCHAR(50), -- Link to the user assigned to handle the request
     reason VARCHAR(255),
     managerObservations TEXT,
     isClean TINYINT(1), -- Changed to TINYINT(1) for boolean-like data
@@ -83,10 +83,10 @@ VALUES
 -- Insert dummy requests
 INSERT INTO Requests (requestNumber, userID, requestDate, description, equipmentArea, brand, Location, serialNumber, assignedTo, reason, managerObservations, isClean, receptionDate, cleaningObservations)
 VALUES 
-    ('REQ001', 2, '2025-01-01', 'Broken conveyor belt', 'Production Line', 'ConveyorMaster', 'Plant A', 'SN001', 3, 'Urgent replacement', 'Requires expedited repair', 1, '2025-01-02', 'Clean and ready for repair'),
-    ('REQ002', 3, '2025-01-05', 'Leaking pipe', 'Boiler Room', 'PipePro', 'Plant B', 'SN002', 2, 'Routine maintenance', 'Observed rust accumulation', 0, NULL, 'Area needs cleaning first'),
-    ('REQ003', 4, '2025-01-10', 'Faulty motor', 'Assembly Area', 'MotorWorks', 'Plant C', 'SN003', 2, 'Warranty issue', 'Inspect for warranty claim', NULL, NULL, NULL);
+    ('000001', 2, '2025-01-01', 'Broken conveyor belt', 'Production Line', 'ConveyorMaster', 'Plant A', 'SN001', 'N', 'Urgent replacement', 'Requires expedited repair', 1, '2025-01-02', 'Clean and ready for repair'),
+    ('000002', 3, '2025-01-05', 'Leaking pipe', 'Boiler Room', 'PipePro', 'Plant B', 'SN002', 'N', 'Routine maintenance', 'Observed rust accumulation', 0, NULL, 'Area needs cleaning first'),
+    ('000003', 4, '2025-01-10', 'Faulty motor', 'Assembly Area', 'MotorWorks', 'Plant C', 'SN003', 'N', 'Warranty issue', 'Inspect for warranty claim', NULL, NULL, NULL);
 
 INSERT INTO ExternalCompanyReports (requestID, reportDate, description, assignedTo, reason, observations)
 VALUES 
-    (1, '2025-01-17', 'Inspection report from external company.', 'REQ004', 'Urgent repair needed', 'Follow-up required after part replacement.');
+    (1, '2025-01-17', 'Inspection report from external company.', '000004', 'Urgent repair needed', 'Follow-up required after part replacement.');

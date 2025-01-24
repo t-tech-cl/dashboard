@@ -1,5 +1,6 @@
 // third-party
 import { configureStore } from '@reduxjs/toolkit';
+import thunk from 'redux-thunk';
 import { useDispatch as useAppDispatch, useSelector as useAppSelector } from 'react-redux';
 import { persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 
@@ -15,7 +16,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
       }
-    })
+    }).concat(thunk)
 });
 
 const persister = persistStore(store);
