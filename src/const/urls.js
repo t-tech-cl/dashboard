@@ -5,5 +5,7 @@ export const ACCOUNT_ENDPOINTS = {
 
 export const REQUESTS_ENDPOINTS = {
   LAST_REQUEST: '/api/requests/get-last',
-  CREATE_REQUEST: '/api/requests/create'
+  REQUEST_LIST: '/api/requests/get-all-requests',
+  CREATE_REQUEST: '/api/requests/create',
+  GET_REQUEST: '/api/requests/get-request'
 };

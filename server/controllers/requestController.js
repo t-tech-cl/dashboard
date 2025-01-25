@@ -48,25 +48,43 @@ export const createRequest = async (req, res) => {
     });
   } catch (err) {
     console.error('Error creating request:', err.message);
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 };
 
 // Get all requests using Sequelize
-export const getRequests = async (req, res) => {
+export const getAllRequests = async (req, res) => {
   try {
     // Fetch all requests from the database using Sequelize
-    const requests = await Request.findAll();
+    const requests = await Request.findAll({
+      attributes: ['requestNumber'],
+      order: [['requestNumber', 'DESC']]
+    });
 
     // Respond with the list of requests
-    res.status(200).json(requests);
+    return res.status(200).json(requests);
   } catch (err) {
     console.error('Error fetching requests:', err.message);
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 };
 
-// Get all requests using Sequelize
+// Get request using Sequelize
+export const getRequest = async (req, res) => {
+  const { requestNumber } = req.query;
+  try {
+    const request = await Request.findOne({
+      where: { requestNumber }
+    });
+
+    return res.status(200).json(request);
+  } catch (err) {
+    console.error('Error fetching requests:', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+// Get last request using Sequelize
 export const getLastRequestNumber = async (req, res) => {
   try {
     // Find the request with the highest ID
@@ -87,10 +105,10 @@ export const getLastRequestNumber = async (req, res) => {
       nextRequestNumber = '000001';
     }
 
-    res.status(200).json({ nextRequestNumber });
+    return res.status(200).json({ nextRequestNumber });
   } catch (error) {
     console.error('Error fetching last request number:', error);
-    res.status(500).json({ error: 'Failed to fetch last request number.' });
+    return res.status(500).json({ error: 'Failed to fetch last request number.' });
   }
 };
 

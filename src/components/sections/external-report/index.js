@@ -8,18 +8,13 @@ const ApplicantExternalReportSection = ({ form }) => {
 
   return (
     <Grid container rowGap={2}>
-      <Typography variant="h3" width="inherit" textAlign="center" sx={{ pb: 2 }}>
+      <Typography variant="h3" width="inherit" textAlign="center" gutterBottom>
         Reporte de Empresa Externa:
       </Typography>
       <Field
         id="reportDate"
         name="reportDate"
-        render={() => (
-          <Grid container flexDirection="column" rowGap={1}>
-            <InputLabel>Fecha:</InputLabel>
-            <DatePicker onChange={handleOnChangeDate} />
-          </Grid>
-        )}
+        render={() => <DatePicker onChange={handleOnChangeDate} label="Fecha:" sx={{ width: '100%' }} />}
       />
       <Field
         id="reportDescription"
@@ -34,23 +29,9 @@ const ApplicantExternalReportSection = ({ form }) => {
       <Field
         id="reportAssignedTo"
         name="reportAssignedTo"
-        render={({ input }) => (
-          <Grid container flexDirection="column" rowGap={1}>
-            <InputLabel>Deriva a:</InputLabel>
-            <TextField {...input} variant="outlined" />
-          </Grid>
-        )}
+        render={({ input }) => <TextField {...input} variant="outlined" label="Deriva a:" fullWidth />}
       />
-      <Field
-        id="reportReason"
-        name="reportReason"
-        render={({ input }) => (
-          <Grid container flexDirection="column" rowGap={1}>
-            <InputLabel>Motivo:</InputLabel>
-            <TextField {...input} />
-          </Grid>
-        )}
-      />
+      <Field id="reportReason" name="reportReason" render={({ input }) => <TextField {...input} label="Motivo:" fullWidth />} />
       <Field
         id="reportObservations"
         name="reportObservations"

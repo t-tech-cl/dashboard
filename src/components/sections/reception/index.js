@@ -8,18 +8,13 @@ const ApplicantRequestReceptionSection = ({ form }) => {
 
   return (
     <Grid container rowGap={2}>
-      <Typography variant="h3" width="inherit" textAlign="center" sx={{ pb: 2 }}>
+      <Typography variant="h3" width="inherit" textAlign="center" gutterBottom>
         Datos de Identificación de Recepción:
       </Typography>
       <Field
         id="receptionDate"
         name="receptionDate"
-        render={() => (
-          <Grid container flexDirection="column" rowGap={1}>
-            <InputLabel>Fecha:</InputLabel>
-            <DatePicker onChange={handleOnChangeDate} />
-          </Grid>
-        )}
+        render={() => <DatePicker label="Fecha:" onChange={handleOnChangeDate} sx={{ width: '100%' }} />}
       />
       <Field
         id="isClean"

@@ -9,18 +9,13 @@ const ApplicantRequestSection = ({ form }) => {
 
   return (
     <Grid container rowGap={2}>
-      <Typography variant="h3" alignSelf="center" width="inherit" textAlign="center" sx={{ pb: 2 }}>
+      <Typography variant="h3" alignSelf="center" width="inherit" textAlign="center" gutterBottom>
         Ingresa datos de Solicitud:
       </Typography>
       <Field
         id="requestDate"
         name="requestDate"
-        render={() => (
-          <Grid container flexDirection="column" rowGap={1}>
-            <InputLabel>Fecha Solicitud:</InputLabel>
-            <DatePicker onChange={handleOnChangeDate} />
-          </Grid>
-        )}
+        render={() => <DatePicker label="Fecha Solicitud:" onChange={handleOnChangeDate} sx={{ width: '100%' }} />}
       />
       <Field
         id="requestType"
@@ -43,43 +38,11 @@ const ApplicantRequestSection = ({ form }) => {
       <Field
         id="equipmentArea"
         name="equipmentArea"
-        render={({ input }) => (
-          <Grid container flexDirection="column" rowGap={1}>
-            <InputLabel>Equipo / Área:</InputLabel>
-            <TextField {...input} variant="outlined" />
-          </Grid>
-        )}
+        render={({ input }) => <TextField {...input} fullWidth label="Equipo / Área:" variant="outlined" />}
       />
-      <Field
-        id="brand"
-        name="brand"
-        render={({ input }) => (
-          <Grid container flexDirection="column" rowGap={1}>
-            <InputLabel>Marca:</InputLabel>
-            <TextField {...input} />
-          </Grid>
-        )}
-      />
-      <Field
-        id="location"
-        name="location"
-        render={({ input }) => (
-          <Grid container flexDirection="column" rowGap={1}>
-            <InputLabel>Ubicación:</InputLabel>
-            <TextField {...input} />
-          </Grid>
-        )}
-      />
-      <Field
-        id="serialNumber"
-        name="serialNumber"
-        render={({ input }) => (
-          <Grid container flexDirection="column" rowGap={1}>
-            <InputLabel>Número:</InputLabel>
-            <TextField {...input} />
-          </Grid>
-        )}
-      />
+      <Field id="brand" name="brand" render={({ input }) => <TextField {...input} fullWidth label="Marca:" />} />
+      <Field id="location" name="location" render={({ input }) => <TextField {...input} fullWidth label="Ubicación:" />} />
+      <Field id="serialNumber" name="serialNumber" render={({ input }) => <TextField {...input} fullWidth label="Número:" />} />
     </Grid>
   );
 };

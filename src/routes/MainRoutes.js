@@ -6,8 +6,10 @@ import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import MaintenanceRequest from 'pages/maintenance-request';
+import MaintenanceRequest2 from 'pages/maintenance-request-2';
 import MaintenanceUpdate from 'pages/maintenance-update';
 import MaintenanceRequestPDF from 'pages/maintenance-pdf';
+import MaintenanceRequestStepper from 'components/maintenance-request-stepper';
 
 // render - dashboard
 // const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
@@ -143,6 +145,14 @@ const MainRoutes = {
         {
           path: '/mantenimiento/solicitud',
           element: <MaintenanceRequest />
+        },
+        {
+          path: '/mantenimiento/solicitud-2',
+          element: <MaintenanceRequest2 />
+        },
+        {
+          path: '/mantenimiento/solicitud-h',
+          element: <MaintenanceRequestStepper />
         },
         {
           path: '/mantenimiento/actualizacion',

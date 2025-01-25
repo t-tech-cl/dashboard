@@ -7,6 +7,7 @@ import axiosServices from 'utils/axios';
 
 const initialState = {
   requestNumber: null,
+  requestList: [],
   applicant: {
     name: '',
     role: '',
@@ -30,6 +31,9 @@ const maintenanceRequest = createSlice({
     },
     getLastRequest(state, action) {
       state.requestNumber = action.payload.nextRequestNumber;
+    },
+    getAllRequests(state, action) {
+      state.requestList = action.payload;
     }
   }
 });
@@ -48,10 +52,31 @@ export const updateRequest = async (payload) => {
   }
 };
 
+export const setCurrentRequest = async (requestNumber) => {
+  try {
+    const response = await axiosServices.get(REQUESTS_ENDPOINTS.GET_REQUEST, { params: { requestNumber } });
+    if (response.status === 200) {
+      dispatch(maintenanceRequest.actions.updateRequest(response.data));
+    }
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const getLastRequest = async () => {
   try {
     const { data } = await axiosServices.get(REQUESTS_ENDPOINTS.LAST_REQUEST);
     dispatch(maintenanceRequest.actions.getLastRequest(data));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllRequests = async () => {
+  try {
+    const { data } = await axiosServices.get(REQUESTS_ENDPOINTS.REQUEST_LIST);
+    dispatch(maintenanceRequest.actions.getAllRequests(data));
   } catch (error) {
     console.log(error);
   }

@@ -30,12 +30,14 @@ const ScrollableSection = ({ children, index }) => {
         delay: index * 0.2
       }}
       style={{
-        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        scrollSnapAlign: 'start'
+        scrollSnapAlign: 'start',
+        left: 0,
+        right: 0,
+        position: 'absolute'
       }}
     >
       {children}
