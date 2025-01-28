@@ -14,7 +14,12 @@ import AuthBackground from 'assets/images/auth/AuthBackground';
 // ==============================|| AUTHENTICATION - WRAPPER ||============================== //
 
 const AuthWrapper = ({ children }) => (
-  <Box sx={{ minHeight: '100vh', backgroundImage: `url("https://www.torrestech.cl/assets/css/images/overlay.png"), url("https://www.torrestech.cl/images/banner.jpg")` }}>
+  <Box
+    sx={{
+      minHeight: '100vh',
+      backgroundImage: `url("https://www.torrestech.cl/assets/css/images/overlay.png"), url("https://www.torrestech.cl/images/banner.jpg")`
+    }}
+  >
     <AuthBackground />
     <Grid
       container
@@ -27,7 +32,7 @@ const AuthWrapper = ({ children }) => (
       <Grid item xs={12} sx={{ ml: 3, mt: 3 }}>
         <Grid container flexDirection="row" columnGap={2} alignItems="center">
           <Logo isIcon sx={{ width: 35, height: 35 }} />
-          <Typography variant='h3'>T-TECH LTDA</Typography>
+          <Typography variant="h3">T-TECH LTDA</Typography>
         </Grid>
       </Grid>
       <Grid item xs={12}>

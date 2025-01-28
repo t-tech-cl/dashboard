@@ -1,7 +1,7 @@
-import MaintenanceUpdateComponent from "components/maintenance-update"
+import MaintenanceUpdateComponent from 'components/maintenance-update';
 
 const MaintenanceUpdate = () => {
-  return <MaintenanceUpdateComponent/>
-}
+  return <MaintenanceUpdateComponent />;
+};
 
-export default MaintenanceUpdate
+export default MaintenanceUpdate;

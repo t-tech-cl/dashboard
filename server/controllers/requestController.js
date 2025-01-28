@@ -2,6 +2,7 @@
 import PdfPrinter from 'pdfmake';
 import fs from 'fs';
 import Request from '../models/Request.js'; // Import the Request model
+import ExternalReport from '../models/ExternalReport.js';
 
 // Create a new request using Sequelize
 export const createRequest = async (req, res) => {
@@ -76,8 +77,11 @@ export const getRequest = async (req, res) => {
     const request = await Request.findOne({
       where: { requestNumber }
     });
+    const externalReport = await ExternalReport.findOne({
+      where: { requestID: request.requestID }
+    });
 
-    return res.status(200).json(request);
+    return res.status(200).json({ ...request.dataValues, externalReport });
   } catch (err) {
     console.error('Error fetching requests:', err.message);
     return res.status(500).json({ error: err.message });

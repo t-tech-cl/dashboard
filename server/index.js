@@ -9,6 +9,12 @@ dotenv.config();
 
 const app = express();
 app.use(express.json()); // To parse JSON request bodies
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Authorization, Accept');
+  next();
+});
 
 app.use('/api/account', accountRoutes);
 app.use('/api/requests', requestRoutes);

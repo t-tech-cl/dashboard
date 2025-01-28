@@ -19,9 +19,26 @@ const Request = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    applicantName: {
+      type: DataTypes.STRING(50),
+      allowNull: false
+    },
+    applicantRole: {
+      type: DataTypes.STRING(50),
+      allowNull: false
+    },
+    applicantArea: {
+      type: DataTypes.STRING(50),
+      allowNull: false
+    },
     requestDate: {
       type: DataTypes.DATEONLY, // Store only the date
       allowNull: false
+    },
+    requestType: {
+      type: DataTypes.ENUM('Preventiva', 'Correctiva', 'Instalaciones'),
+      allowNull: false,
+      defaultValue: 'Preventiva'
     },
     lastUpdatedBy: {
       type: DataTypes.INTEGER
@@ -71,11 +88,15 @@ const Request = sequelize.define(
   }
 );
 
-// Define associations if necessary (e.g., Requests belongs to User, etc.)
+// Define associations
 Request.associate = (models) => {
-  Request.belongsTo(models.User, { foreignKey: 'UserID', as: 'user' });
-  Request.belongsTo(models.User, { foreignKey: 'LastUpdatedBy', as: 'lastUpdatedBy' });
-  Request.belongsTo(models.User, { foreignKey: 'AssignedTo', as: 'assignedTo' });
+  // A request has many external reports
+  Request.hasMany(models.ExternalReport, { foreignKey: 'requestID', as: 'externalReports' });
+
+  // Other associations with User model (if any)
+  Request.belongsTo(models.User, { foreignKey: 'userID', as: 'user' });
+  Request.belongsTo(models.User, { foreignKey: 'lastUpdatedBy', as: 'lastUpdatedBy' });
+  Request.belongsTo(models.User, { foreignKey: 'assignedTo', as: 'assignedTo' });
 };
 
 export default Request;

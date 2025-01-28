@@ -82,7 +82,7 @@ const SingleSectionForm = () => {
       sx={{
         overflowY: 'scroll',
         height: '100vh',
-        scrollSnapType: 'none' // Disable CSS snapping in favor of manual control
+        scrollSnapType: 'y' // Disable CSS snapping in favor of manual control
       }}
     >
       {sections.map((section, index) => (

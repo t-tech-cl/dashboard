@@ -4,13 +4,14 @@ import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { getLastRequest, updateRequest } from 'store/reducers/maintenanceRequest';
 
-const ApplicantForm = ({ onSubmit }) => {
+const ApplicantForm = () => {
   const dispatch = useDispatch();
 
   const {
-    maintenanceRequest: { requestNumber, applicant }
+    maintenanceRequest: {
+      request: { requestNumber }
+    }
   } = useSelector((state) => state);
-  console.log(applicant);
 
   useEffect(() => {
     const getData = async () => await getLastRequest();
@@ -25,9 +26,10 @@ const ApplicantForm = ({ onSubmit }) => {
     signature: applicant?.signature || ''
   };
 
-  const handleOnSubmit = async ({ requestNumber, ...applicant }) => {
-    await dispatch(updateRequest({ requestNumber, applicant }));
-    onSubmit?.();
+  const handleOnSubmit = async ({ requestNumber, ...applicant }) => await dispatch(updateRequest({ requestNumber, applicant }));
+
+  const handleOnChangeRequest = async ({ target }) => {
+    await console.log(target.value);
   };
 
   return (
@@ -50,6 +52,7 @@ const ApplicantForm = ({ onSubmit }) => {
                     {...input}
                     variant="outlined"
                     disabled
+                    onChange={handleOnChangeRequest}
                     sx={{
                       '& .MuiInputBase-input.Mui-disabled': {
                         WebkitTextFillColor: '#ffffff70'

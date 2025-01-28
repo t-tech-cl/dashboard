@@ -19,6 +19,9 @@ CREATE TABLE Requests (
     requestID INT AUTO_INCREMENT PRIMARY KEY,
     requestNumber VARCHAR(50) NOT NULL UNIQUE,
     userID INT NOT NULL, -- Link to the user who created the request
+    applicantName VARCHAR(100),
+    applicantRole VARCHAR(50),
+    applicantArea VARCHAR(100),
     requestDate DATE NOT NULL,
     lastUpdatedBy INT, -- Link to the user who last updated the request
     lastUpdateDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -90,3 +93,13 @@ VALUES
 INSERT INTO ExternalCompanyReports (requestID, reportDate, description, assignedTo, reason, observations)
 VALUES 
     (1, '2025-01-17', 'Inspection report from external company.', '000004', 'Urgent repair needed', 'Follow-up required after part replacement.');
+
+UPDATE Requests
+SET applicantName = 'Default Name', 
+    applicantRole = 'Default Role', 
+    applicantArea = 'Default Area'
+WHERE applicantName IS NULL;
+
+ALTER TABLE Requests
+ADD COLUMN requestType ENUM('Preventiva', 'Correctiva', 'Instalaciones') NOT NULL DEFAULT 'Preventiva';
+

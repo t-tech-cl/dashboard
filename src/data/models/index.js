@@ -1,8 +1,5 @@
 import sequelize from "../database"
-import Requestor from "./Requestor"
-import RequestDetails from "./RequestDetails"
-import ManagerEvaluation from "./ManagerEvaluation"
-import CleaningStatus from "./CleaningStatus"
+
 import RequestUpdates from "./RequestUpdates"
 
 // Define associations
@@ -20,9 +17,5 @@ const { sequelize } = require('./models');
 // Export models
 export {
   sequelize,
-  Requestor,
-  RequestDetails,
-  ManagerEvaluation,
-  CleaningStatus,
   RequestUpdates
 };

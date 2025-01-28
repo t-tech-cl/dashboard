@@ -14,6 +14,15 @@ const sequelize = new Sequelize(
   }
 );
 
+sequelize
+  .sync({ alter: true }) // Sync the models with the database
+  .then(() => {
+    console.log('Database updated!');
+  })
+  .catch((error) => {
+    console.error('Error syncing database:', error);
+  });
+
 // Create an async function to test the connection
 const testConnection = async () => {
   try {

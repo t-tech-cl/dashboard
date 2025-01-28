@@ -20,8 +20,8 @@ import DrawerHeader from 'layout/MainLayout/Drawer/DrawerHeader';
 // ==============================|| HEADER - CONTENT ||============================== //
 
 const HeaderContent = () => {
-  const { 
-    // i18n, 
+  const {
+    // i18n,
     menuOrientation
   } = useConfig();
 

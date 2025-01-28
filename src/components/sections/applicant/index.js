@@ -1,25 +1,13 @@
 import { Autocomplete, Grid, TextField, Typography } from '@mui/material';
-import React, { useEffect } from 'react';
+import React, { memo } from 'react';
 import { Field } from 'react-final-form';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
-import { getAllRequests, getLastRequest } from 'store/reducers/maintenanceRequest';
+import { setCurrentRequest } from 'store/reducers/maintenanceRequest';
 
-const ApplicantSection = () => {
-  const { requestNumber, requestList } = useSelector((state) => state.maintenanceRequest);
-
-  useEffect(() => {
-    const getLastRequestNumber = async () => {
-      await getLastRequest();
-    };
-
-    const getAllRequestNumbers = async () => {
-      await getAllRequests();
-    };
-
-    !requestNumber && getLastRequestNumber();
-    !requestList?.length && getAllRequestNumbers();
-  }, [requestNumber, requestList]);
+const ApplicantSection = memo(({ initialValues }) => {
+  const { requestList } = useSelector((state) => state.maintenanceRequest);
+  const { requestNumber, applicantName, applicantRole, applicantArea } = initialValues;
 
   const handleOnChangeRequestNumber = async ({ target }) => {
     if (!target.innerText) return;
@@ -32,7 +20,7 @@ const ApplicantSection = () => {
   };
 
   return (
-    <Grid container flexDirection="column" rowGap={2}>
+    <Grid container flexDirection="column" rowGap={1}>
       <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}>
         <Typography variant="h2" textAlign="center" gutterBottom>
           Identificación del solicitante:
@@ -63,8 +51,8 @@ const ApplicantSection = () => {
         </Field>
       </motion.div>
 
-      <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}>
-        <Field name="name">
+      <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}>
+        <Field name="applicantName" defaultValue={applicantName}>
           {({ input, meta }) => (
             <TextField
               {...input}
@@ -79,8 +67,8 @@ const ApplicantSection = () => {
         </Field>
       </motion.div>
 
-      <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.3, duration: 0.5 }}>
-        <Field name="role">
+      <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}>
+        <Field name="applicantRole" defaultValue={applicantRole}>
           {({ input, meta }) => (
             <TextField
               {...input}
@@ -95,8 +83,8 @@ const ApplicantSection = () => {
         </Field>
       </motion.div>
 
-      <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.4, duration: 0.5 }}>
-        <Field name="area">
+      <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}>
+        <Field name="applicantArea" defaultValue={applicantArea}>
           {({ input, meta }) => (
             <TextField
               {...input}
@@ -110,10 +98,8 @@ const ApplicantSection = () => {
           )}
         </Field>
       </motion.div>
-
-      <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.5, duration: 0.5 }}></motion.div>
     </Grid>
   );
-};
+});
 
 export default ApplicantSection;

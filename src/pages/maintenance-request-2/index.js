@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Button, Typography, Grid, Stepper, Step, StepLabel } from '@mui/material';
 import { getAllRequests, getLastRequest } from 'store/reducers/maintenanceRequest';
 import { useSelector } from 'react-redux';
+import { motion } from 'framer-motion';
 import ScrollableSection from 'components/scrollableSection';
 import ApplicantSection from 'components/sections/applicant';
 import ApplicantRequestSection from 'components/sections/request';
@@ -11,39 +12,28 @@ import ApplicantExternalReportSection from 'components/sections/external-report'
 import ApplicantRequestReceptionSection from 'components/sections/reception';
 import AuthContext from 'contexts/AuthContext';
 import Card from 'components/card';
-
-// const validate = (values) => {
-//   const errors = {};
-//   if (!values.fullName) {
-//     errors.fullName = 'Full Name is required';
-//   }
-//   if (!values.email) {
-//     errors.email = 'Email is required';
-//   } else if (!/\S+@\S+\.\S+/.test(values.email)) {
-//     errors.email = 'Invalid email address';
-//   }
-//   if (!values.phone) {
-//     errors.phone = 'Phone Number is required';
-//   }
-//   return errors;
-// };
+import { isMobile } from 'react-device-detect';
 
 const LongForm = () => {
   const [activeStep, setActiveStep] = useState(0);
   const sectionRefs = useRef([]);
-
-  // const dispatch = useDispatch();
+  const sectionLabelRefs = useRef([]);
 
   const { user } = useContext(AuthContext);
+  const {
+    request: { requestNumber, ...request },
+    requestList
+  } = useSelector((state) => state.maintenanceRequest);
 
-  const { requestNumber, requestList } = useSelector((state) => state.maintenanceRequest);
-
-  const initialValues = {
-    userID: user?.userID,
-    requestNumber,
-    requestType: 'preventiva',
-    requestDate: null
-  };
+  const initialValues = useMemo(
+    () => ({
+      userID: user?.userID,
+      requestNumber,
+      isClean: true,
+      ...request
+    }),
+    [requestNumber, request, user?.userID]
+  );
 
   useEffect(() => {
     const getLastRequestNumber = async () => {
@@ -63,6 +53,30 @@ const LongForm = () => {
     console.log('Form Submitted:', values);
   };
 
+  const handleNextSection = useCallback(() => {
+    const nextSection = sectionRefs.current[activeStep + 1];
+    nextSection.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center'
+    });
+    setActiveStep(activeStep + 1);
+  }, [activeStep]);
+
+  const handlePreviousSection = useCallback(() => {
+    const nextSection = sectionRefs.current[activeStep - 1];
+    nextSection.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center'
+    });
+    setActiveStep(activeStep - 1);
+  }, [activeStep]);
+
+  const handleClickLabel = (index) => setActiveStep(index);
+
+  const handleOnSubmit = (values) => console.log(values);
+
   const stepLabels = [
     { label: 'Identificación del solicitante' },
     { label: 'Identificación de la Solicitud' },
@@ -72,97 +86,206 @@ const LongForm = () => {
   ];
 
   const forms = [
-    ({ values }) => (
-      <Card>
-        <ApplicantSection requestNumber={requestNumber} />
-        <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
-          <Button onClick={() => console.log(values)} variant="contained" color="primary">
-            Siguiente
-          </Button>
-        </Grid>
-      </Card>
+    useCallback(
+      () => (
+        <Card>
+          <ApplicantSection initialValues={initialValues} />
+          <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
+            <Button onClick={handleNextSection} variant="contained" color="primary">
+              Siguiente
+            </Button>
+          </Grid>
+        </Card>
+      ),
+      [initialValues, handleNextSection]
     ),
-    ({ form, values }) => (
-      <Card>
-        <ApplicantRequestSection form={form} />
-        <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
-          <Button onClick={console.log} sx={{ mr: 1 }}>
-            Regresar
-          </Button>
-          <Button onClick={() => console.log(values)} variant="contained" color="primary">
-            Siguiente
-          </Button>
-        </Grid>
-      </Card>
+    useCallback(
+      ({ form }) => (
+        <Card>
+          <ApplicantRequestSection form={form} initialValues={initialValues} />
+          <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
+            <Button onClick={handlePreviousSection} sx={{ mr: 1 }}>
+              Regresar
+            </Button>
+            <Button onClick={handleNextSection} variant="contained" color="primary">
+              Siguiente
+            </Button>
+          </Grid>
+        </Card>
+      ),
+      [handlePreviousSection, handleNextSection, initialValues]
     ),
-    ({ values }) => (
-      <Card>
-        <ApplicantEvaluationSection />
-        <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
-          <Button onClick={console.log} sx={{ mr: 1 }}>
-            Regresar
-          </Button>
-          <Button onClick={() => console.log(values)} variant="contained" color="primary">
-            Siguiente
-          </Button>
-        </Grid>
-      </Card>
+    useCallback(
+      () => (
+        <Card>
+          <ApplicantEvaluationSection initialValues={initialValues} />
+          <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
+            <Button onClick={handlePreviousSection} sx={{ mr: 1 }}>
+              Regresar
+            </Button>
+            <Button onClick={handleNextSection} variant="contained" color="primary">
+              Siguiente
+            </Button>
+          </Grid>
+        </Card>
+      ),
+      [handlePreviousSection, handleNextSection, initialValues]
     ),
-    ({ form, values }) => (
-      <Card>
-        <ApplicantExternalReportSection form={form} />
-        <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
-          <Button onClick={console.log} sx={{ mr: 1 }}>
-            Regresar
-          </Button>
-          <Button onClick={() => console.log(values)} variant="contained" color="primary">
-            Siguiente
-          </Button>
-        </Grid>
-      </Card>
+    useCallback(
+      ({ form }) => (
+        <Card>
+          <ApplicantExternalReportSection form={form} initialValues={initialValues} />
+          <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
+            <Button onClick={handlePreviousSection} sx={{ mr: 1 }}>
+              Regresar
+            </Button>
+            <Button onClick={handleNextSection} variant="contained" color="primary">
+              Siguiente
+            </Button>
+          </Grid>
+        </Card>
+      ),
+      [handlePreviousSection, handleNextSection, initialValues]
     ),
-    ({ form, values, onSubmit }) => (
-      <Card>
-        <ApplicantRequestReceptionSection form={form} onSubmit={onSubmit} />
-        <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
-          <Button onClick={console.log} sx={{ mr: 1 }}>
-            Regresar
-          </Button>
-          <Button onClick={() => handleOnSubmit(values)} variant="contained" color="success">
-            Enviar solicitud
-          </Button>
-        </Grid>
-      </Card>
+    useCallback(
+      ({ form, values, onSubmit }) => (
+        <Card>
+          <ApplicantRequestReceptionSection form={form} onSubmit={onSubmit} initialValues={initialValues} />
+          <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
+            <Button onClick={handlePreviousSection} sx={{ mr: 1 }}>
+              Regresar
+            </Button>
+            <Button onClick={() => handleOnSubmit(values)} variant="contained" color="success">
+              Enviar solicitud
+            </Button>
+          </Grid>
+        </Card>
+      ),
+      [handlePreviousSection, initialValues]
     )
   ];
 
+  // Intersection Observer to update active step when section is in view
+  useEffect(() => {
+    let timeout;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          sectionRefs.current.forEach((ref, index) => {
+            if (entry.target === ref && entry.isIntersecting) {
+              setActiveStep(index);
+              // Prevent any "bouncing" and just center the section
+              if (entry.isIntersecting) {
+                // Clear any previous timeout to prevent overlapping smooth scrolling
+                clearTimeout(timeout);
+
+                timeout = setTimeout(() => {
+                  ref.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'center'
+                  });
+                }, 50); // Delay scroll action to improve smoothness
+              }
+            }
+          });
+        });
+      },
+      { threshold: 0.2 }
+    ); // Trigger when 20% is visible
+
+    // Ensure that each section is observed
+    sectionRefs.current.forEach((section) => {
+      if (section) observer.observe(section);
+    });
+
+    return () => {
+      observer.disconnect(); // Cleanup observer
+      clearTimeout(timeout); // Clear any lingering timeouts
+    };
+  }, []);
+
   return (
     <Grid justifyContent="center" flex={1}>
-      <Grid container flexDirection="column" justifyContent="center" height="100%">
-        <Stepper activeStep={activeStep} orientation="vertical" sx={{ position: 'fixed', alignContent: 'center' }}>
-          {stepLabels.map((item) => {
-            return (
-              <Step key={0}>
-                <StepLabel>
-                  <Typography variant="h5">{item.label}</Typography>
-                </StepLabel>
-              </Step>
-            );
-          })}
+      {isMobile ? (
+        <Stepper
+          activeStep={activeStep}
+          orientation="horizontal"
+          sx={{ position: 'fixed', alignContent: 'center', paddingTop: 2, left: 15, right: 5 }}
+        >
+          {stepLabels.map((index) => (
+            <Step key={index}>
+              <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 1, duration: 1 }}>
+                <StepLabel
+                  ref={(el) => (sectionLabelRefs.current[index] = el)}
+                  onClick={() => handleClickLabel(index)}
+                  style={{ zIndex: 99, cursor: 'pointer' }}
+                  StepIconProps={{
+                    sx: {
+                      '&.Mui-completed': {
+                        background: '#fff',
+                        borderRadius: '24px'
+                      }
+                    }
+                  }}
+                />
+              </motion.div>
+            </Step>
+          ))}
         </Stepper>
-      </Grid>
-      <ScrollableSection ref={(el) => (sectionRefs.current[index] = el)}>
-        <Form
-          onSubmit={handleSubmit}
-          render={({ handleSubmit, form, values }) => (
-            <form onSubmit={handleSubmit}>
+      ) : (
+        <Grid container flexDirection="column" justifyContent="center" height="100%">
+          <Stepper activeStep={activeStep} orientation="vertical" sx={{ position: 'fixed', alignContent: 'center' }}>
+            {stepLabels.map((item, index) => (
+              <Step key={index}>
+                <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 1, duration: 1 }}>
+                  <StepLabel
+                    ref={(el) => (sectionLabelRefs.current[index] = el)}
+                    onClick={() => handleClickLabel(index)}
+                    style={{ zIndex: 99, cursor: 'pointer' }}
+                    StepIconProps={{
+                      sx: {
+                        '&.Mui-completed': {
+                          background: '#fff',
+                          borderRadius: '24px'
+                        }
+                      }
+                    }}
+                  >
+                    <Typography variant="h5">{item.label}</Typography>
+                  </StepLabel>
+                </motion.div>
+              </Step>
+            ))}
+          </Stepper>
+        </Grid>
+      )}
+      <Form
+        onSubmit={handleSubmit}
+        render={({ handleSubmit, form, values }) => (
+          <form onSubmit={handleSubmit} style={{ zIndex: -1 }}>
+            <ScrollableSection style={{ height: '100vh' }}>
               {forms.map((Component, index) => (
-                <Component key={index} form={form} values={values} initialValues={initialValues} onSubmit={console.log} />
+                <div
+                  ref={(el) => (sectionRefs.current[index] = el)} // Ensure each section is referenced properly
+                  key={index}
+                  style={{ paddingTop: '100px', paddingBottom: '100px', scrollSnapAlign: 'center' }} // Add space for visibility
+                >
+                  <Component
+                    form={form}
+                    values={values}
+                    initialValues={initialValues}
+                    onNext={handleNextSection}
+                    onPrevious={handlePreviousSection}
+                    onSubmit={console.log}
+                  />
+                </div>
               ))}
-            </form>
-          )}
-        />
-      </ScrollableSection>
+            </ScrollableSection>
+          </form>
+        )}
+      />
     </Grid>
   );
 };

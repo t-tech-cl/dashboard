@@ -32,7 +32,7 @@ const DrawerHeader = ({ open }) => {
       }}
     >
       <div
-        style={{ 
+        style={{
           display: 'flex',
           flexDirection: 'row',
           rowGap: '10px',
@@ -41,7 +41,7 @@ const DrawerHeader = ({ open }) => {
         }}
       >
         <Logo isIcon sx={{ width: 35, height: 35 }} />
-        {open && (<Typography variant='h3'>T-TECH LTDA</Typography>)}
+        {open && <Typography variant="h3">T-TECH LTDA</Typography>}
       </div>
     </DrawerHeaderStyled>
   );

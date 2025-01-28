@@ -6,14 +6,8 @@ import { dispatch } from 'store';
 import axiosServices from 'utils/axios';
 
 const initialState = {
-  requestNumber: null,
   requestList: [],
-  applicant: {
-    name: '',
-    role: '',
-    area: '',
-    signature: null
-  }
+  request: {}
 };
 
 // ==============================|| maintenanceRequest - SLICE ||============================== //
@@ -24,13 +18,10 @@ const maintenanceRequest = createSlice({
   reducers: {
     // update event
     updateRequest(state, action) {
-      state.requestNumber = action.payload.requestNumber;
-      const { name, role, area, signature, ...payload } = action.payload;
-      state.applicant = { name, role, area, signature };
-      state.request = payload;
+      state.request = action.payload;
     },
     getLastRequest(state, action) {
-      state.requestNumber = action.payload.nextRequestNumber;
+      state.request.requestNumber = action.payload.nextRequestNumber;
     },
     getAllRequests(state, action) {
       state.requestList = action.payload;

@@ -40,7 +40,7 @@ const User = sequelize.define(
   },
   {
     tableName: 'Users', // Use the correct table name if it differs
-    timestamps: false // Disable automatic timestamps if not used
+    timestamps: true // Disable automatic timestamps if not used
   }
 );
 

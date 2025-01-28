@@ -39,6 +39,7 @@ export const getUsers = async (req, res) => {
 
 // Get all users
 export const loginUser = async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
   const { email, password } = req.body;
 
   try {
