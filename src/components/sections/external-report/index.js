@@ -6,13 +6,16 @@ import React, { memo, useEffect } from 'react';
 import { Field } from 'react-final-form';
 
 const ApplicantExternalReportSection = memo(({ form, initialValues }) => {
-  const { externalReport: { reportDate, description, assignedTo, reason, observations } = {} } = initialValues;
+  const {
+    externalReport: { reportDate, description, assignedTo, reason, observations }
+  } = initialValues;
 
   const unformattedReportDate = moment(reportDate, 'YYYY-MM-DD');
   const handleOnChangeDate = (date) => form.change('reportDate', date.valueOf());
 
   useEffect(() => {
-    form.change('reportDate', unformattedReportDate.valueOf());
+    if (reportDate && unformattedReportDate.isValid()) form.change('reportDate', unformattedReportDate.valueOf());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, unformattedReportDate]);
 
   return (
@@ -38,7 +41,12 @@ const ApplicantExternalReportSection = memo(({ form, initialValues }) => {
           id="reportDate"
           name="reportDate"
           render={() => (
-            <DatePicker onChange={handleOnChangeDate} label="Fecha:" defaultValue={unformattedReportDate} sx={{ width: '100%' }} />
+            <DatePicker
+              onChange={handleOnChangeDate}
+              label="Fecha:"
+              defaultValue={unformattedReportDate.isValid() ? unformattedReportDate : null}
+              sx={{ width: '100%' }}
+            />
           )}
         />
       </motion.div>
@@ -55,7 +63,7 @@ const ApplicantExternalReportSection = memo(({ form, initialValues }) => {
           render={({ input }) => (
             <Grid container flexDirection="column" rowGap={1}>
               <InputLabel>Descripción:</InputLabel>
-              <TextField {...input} multiline rows={3} />
+              <TextField {...input} multiline rows={2} />
             </Grid>
           )}
         />
@@ -86,6 +94,34 @@ const ApplicantExternalReportSection = memo(({ form, initialValues }) => {
           render={({ input }) => <TextField {...input} label="Motivo:" fullWidth />}
         />
       </motion.div>
+      <Grid container flexDirection="row" flexWrap="nowrap" gap={2}>
+        <motion.div
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+          style={{ width: '100%' }}
+        >
+          <Field
+            id="documentNumber"
+            name="documentNumber"
+            defaultValue={reason}
+            render={({ input }) => <TextField {...input} label="N° Documento:" fullWidth />}
+          />
+        </motion.div>
+        <motion.div
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+          style={{ width: '100%' }}
+        >
+          <Field
+            id="documentType"
+            name="documentType"
+            defaultValue={reason}
+            render={({ input }) => <TextField {...input} label="Tipo documento:" fullWidth />}
+          />
+        </motion.div>
+      </Grid>
       <motion.div
         initial={{ x: -50, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -99,7 +135,7 @@ const ApplicantExternalReportSection = memo(({ form, initialValues }) => {
           render={({ input }) => (
             <Grid container flexDirection="column" rowGap={1}>
               <InputLabel>Observaciones:</InputLabel>
-              <TextField {...input} multiline rows={3} />
+              <TextField {...input} multiline rows={2} />
             </Grid>
           )}
         />

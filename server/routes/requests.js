@@ -1,6 +1,13 @@
 // routes/requests.js
 import express from 'express';
-import { createRequest, generateRequestPDF, getAllRequests, getRequest, getLastRequestNumber } from '../controllers/requestController.js';
+import {
+  createRequest,
+  getAllRequests,
+  getRequest,
+  getLastRequestNumber,
+  getAll,
+  getAllExternalReports
+} from '../controllers/requestController.js';
 
 const router = express.Router();
 
@@ -10,8 +17,8 @@ router.get('/get-request', getRequest);
 
 // Route to get all requests
 router.get('/get-all-requests', getAllRequests);
-// Route to create the PDF
-router.get('/generate-pdf', generateRequestPDF);
+router.get('/get-all', getAll);
+router.get('/get-all-external-reports', getAllExternalReports);
 
 // Route to get the last request
 router.get('/get-last', getLastRequestNumber);

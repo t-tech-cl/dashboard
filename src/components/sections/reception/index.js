@@ -8,12 +8,15 @@ import { Field } from 'react-final-form';
 const ApplicantRequestReceptionSection = memo(({ form, initialValues }) => {
   const { receptionDate, isClean, cleaningObservations } = initialValues;
 
-  const unformattedReceptionDate = moment(receptionDate, 'YYYY-MM-DD');
+  const unformattedReceptionDate = moment(receptionDate, 'DD-MM-YYYY');
 
-  const handleOnChangeDate = (date) => form.change('receptionDate', date.valueOf());
+  const handleOnChangeDate = (date) => {
+    form.change('receptionDate', date.valueOf());
+  };
 
   useEffect(() => {
-    form.change('receptionDate', unformattedReceptionDate.valueOf());
+    if (receptionDate && unformattedReceptionDate.isValid()) form.change('receptionDate', unformattedReceptionDate.valueOf());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, unformattedReceptionDate]);
 
   return (
@@ -39,7 +42,13 @@ const ApplicantRequestReceptionSection = memo(({ form, initialValues }) => {
           id="receptionDate"
           name="receptionDate"
           render={() => (
-            <DatePicker label="Fecha:" onChange={handleOnChangeDate} defaultValue={unformattedReceptionDate} sx={{ width: '100%' }} />
+            <DatePicker
+              label="Fecha:"
+              onChange={handleOnChangeDate}
+              value={unformattedReceptionDate.isValid() ? unformattedReceptionDate : null}
+              format="DD-MM-YYYY"
+              sx={{ width: '100%' }}
+            />
           )}
         />
       </motion.div>

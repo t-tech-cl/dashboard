@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 
 // ==============================|| AUTHENTICATION - CARD WRAPPER ||============================== //
 
-const Card = ({ children, ...other }) => {
+const Card = ({ children, maxWidth = { xs: 400, lg: 475 }, margin = { xs: 2.5, md: 3 }, ...other }) => {
   const theme = useTheme();
   return (
     <MainCard
@@ -18,8 +18,8 @@ const Card = ({ children, ...other }) => {
         border: '1px solid #ddd',
         borderRadius: '8px',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-        maxWidth: { xs: 400, lg: 475 },
-        margin: { xs: 2.5, md: 3 },
+        maxWidth,
+        margin,
         '& > *': {
           flexGrow: 1,
           flexBasis: '50%'

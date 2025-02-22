@@ -13,8 +13,13 @@ const ApplicantRequestSection = memo(({ form, initialValues }) => {
   const handleOnChangeDate = (date) => form.change('requestDate', date.valueOf());
 
   useEffect(() => {
-    form.change('requestDate', unformattedRequestDate.valueOf());
-  }, [form, unformattedRequestDate]);
+    if (requestDate && unformattedRequestDate.isValid()) {
+      form.change('requestDate', unformattedRequestDate.valueOf());
+    } else {
+      form.change('requestDate', moment());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestDate]);
 
   return (
     <Grid container rowGap={2}>
@@ -40,7 +45,7 @@ const ApplicantRequestSection = memo(({ form, initialValues }) => {
           name="requestDate"
           render={() => (
             <DatePicker
-              defaultValue={unformattedRequestDate}
+              value={unformattedRequestDate.isValid() ? unformattedRequestDate : moment()}
               label="Fecha Solicitud:"
               onChange={handleOnChangeDate}
               sx={{ width: '100%' }}

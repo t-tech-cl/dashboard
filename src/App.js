@@ -11,6 +11,7 @@ import ScrollTop from 'components/ScrollTop';
 import Snackbar from 'components/@extended/Snackbar';
 import Notistack from 'components/third-party/Notistack';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import 'moment/locale/es';
 
 import { dispatch } from 'store';
 import { fetchMenu } from 'store/reducers/menu';
@@ -40,7 +41,7 @@ const App = () => {
     <ThemeCustomization>
       <RTLLayout>
         <Locales>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
+          <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es">
             <ScrollTop>
               <AuthProvider>
                 <Notistack>

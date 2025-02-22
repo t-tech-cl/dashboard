@@ -1,12 +1,12 @@
-// import PDFDocument from 'pdfkit';
-import PdfPrinter from 'pdfmake';
-import fs from 'fs';
 import Request from '../models/Request.js'; // Import the Request model
 import ExternalReport from '../models/ExternalReport.js';
 
 // Create a new request using Sequelize
 export const createRequest = async (req, res) => {
   const {
+    applicantName,
+    applicantRole,
+    applicantArea,
     requestNumber,
     userID,
     requestDate,
@@ -15,37 +15,109 @@ export const createRequest = async (req, res) => {
     brand,
     location,
     serialNumber,
+    documentNumber,
+    documentType,
     assignedTo,
     reason,
     managerObservations,
-    isClean,
     receptionDate,
-    cleaningObservations
+    cleaningObservations,
+    reportDate,
+    reportDescription,
+    reportObservations,
+    reportAssignedTo,
+    reportReason,
+    status
   } = req.body;
 
+  const isClean = req.body.isClean === 'si' ? 1 : 0;
+
   try {
-    // Create a new request using Sequelize
-    const newRequest = await Request.create({
-      requestNumber,
-      userID,
-      requestDate,
-      description,
-      equipmentArea,
-      brand,
-      location,
-      serialNumber,
-      assignedTo,
-      reason,
-      managerObservations,
-      isClean,
-      receptionDate,
-      cleaningObservations
+    let request = await Request.findOne({
+      where: {
+        requestNumber
+      }
     });
+
+    if (request && request.requestID) {
+      request.set({
+        applicantName,
+        applicantRole,
+        applicantArea,
+        userID,
+        requestDate,
+        description,
+        equipmentArea,
+        brand,
+        status,
+        location,
+        serialNumber,
+        assignedTo,
+        reason,
+        managerObservations,
+        isClean: isClean ? 1 : 0,
+        receptionDate,
+        cleaningObservations
+      });
+
+      let externalReport = await ExternalReport.findOne({
+        where: {
+          requestID: Number(requestNumber)
+        }
+      });
+
+      externalReport.set({
+        documentNumber,
+        documentType,
+        reportDate,
+        description: reportDescription,
+        observations: reportObservations,
+        assignedTo: reportAssignedTo,
+        reason: reportReason
+      });
+
+      await Promise.all([request.save(), externalReport.save()]);
+
+      await request.save();
+    } else {
+      request = await Request.create({
+        applicantName,
+        applicantRole,
+        applicantArea,
+        requestNumber,
+        userID,
+        requestDate,
+        description,
+        equipmentArea,
+        brand,
+        location,
+        serialNumber,
+        assignedTo,
+        reason,
+        managerObservations,
+        isClean,
+        receptionDate,
+        cleaningObservations,
+        status
+      });
+
+      var externalReport = await ExternalReport.create({
+        requestID: parseInt(requestNumber),
+        documentNumber,
+        documentType,
+        reportDate,
+        description: reportDescription,
+        observations: reportObservations,
+        assignedTo: reportAssignedTo,
+        reason: reportReason
+      });
+    }
 
     // Respond with success
     return res.status(200).json({
       message: 'Request created successfully',
-      requestId: newRequest.requestID
+      requestId: request.requestID,
+      externalReportId: externalReport.reportID
     });
   } catch (err) {
     console.error('Error creating request:', err.message);
@@ -58,7 +130,7 @@ export const getAllRequests = async (req, res) => {
   try {
     // Fetch all requests from the database using Sequelize
     const requests = await Request.findAll({
-      attributes: ['requestNumber'],
+      attributes: ['requestNumber', 'lastUpdateDate', 'status'],
       order: [['requestNumber', 'DESC']]
     });
 
@@ -78,10 +150,10 @@ export const getRequest = async (req, res) => {
       where: { requestNumber }
     });
     const externalReport = await ExternalReport.findOne({
-      where: { requestID: request.requestID }
+      where: { requestID: Number(request.requestNumber) }
     });
 
-    return res.status(200).json({ ...request.dataValues, externalReport });
+    return res.status(200).json({ ...request.dataValues, externalReport: externalReport.dataValues });
   } catch (err) {
     console.error('Error fetching requests:', err.message);
     return res.status(500).json({ error: err.message });
@@ -103,7 +175,7 @@ export const getLastRequestNumber = async (req, res) => {
       // Extract the numeric part of the last request number
       const lastNumber = parseInt(lastRequest.requestNumber.replace(/[^0-9]/g, ''), 10);
       // Increment the number and format it as a string with leading zeros
-      nextRequestNumber = `${(lastNumber + 1).toString().padStart(5, '0')}`;
+      nextRequestNumber = `${(lastNumber + 1).toString().padStart(6, '0')}`;
     } else {
       // If no requests exist, start with the first request number
       nextRequestNumber = '000001';
@@ -116,123 +188,20 @@ export const getLastRequestNumber = async (req, res) => {
   }
 };
 
-export const generateRequestPDF = async () => {
-  const printer = new PdfPrinter();
+export const getAll = async (req, res) => {
+  try {
+    const requests = await Request.findAll();
+    return res.json(requests);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch requests' });
+  }
+};
 
-  const docDefinition = {
-    content: [
-      { text: 'SOLICITUD DE MANTENIMIENTO', style: 'header', alignment: 'center' },
-      {
-        columns: [
-          { text: 'Código: R-POE-06-03', alignment: 'right' },
-          { text: 'Versión: 01', alignment: 'right' },
-          { text: 'Fecha Elab.: 28-05-2024', alignment: 'right' },
-          { text: 'Fecha Modif.:', alignment: 'right' }
-        ],
-        margin: [0, 10]
-      },
-      {
-        text: 'IDENTIFICACIÓN DEL SOLICITANTE',
-        style: 'subheader',
-        margin: [0, 20, 0, 5]
-      },
-      {
-        table: {
-          widths: ['25%', '75%'],
-          body: [
-            ['N° SOLICITUD:', ' '],
-            ['NOMBRE:', ' '],
-            ['CARGO:', ' '],
-            ['ÁREA:', ' '],
-            ['FIRMA:', ' ']
-          ]
-        },
-        margin: [0, 10]
-      },
-      {
-        text: 'IDENTIFICACIÓN DE LA SOLICITUD',
-        style: 'subheader',
-        margin: [0, 20, 0, 5]
-      },
-      {
-        table: {
-          widths: ['50%', '50%'],
-          body: [
-            ['FECHA SOLICITUD:', ' '],
-            ['TIPO DE SOLICITUD:', 'Preventiva [ ] Correctiva [ ] Instalaciones [ ]'],
-            ['DESCRIPCIÓN:', ' '],
-            ['EQUIPO/ÁREA:', ' '],
-            ['MARCA:', ' '],
-            ['UBICACIÓN:', ' '],
-            ['NÚMERO:', ' ']
-          ]
-        },
-        margin: [0, 10]
-      },
-      {
-        text: 'EVALUACIÓN JEFE DE MANTENCIÓN',
-        style: 'subheader',
-        margin: [0, 20, 0, 5]
-      },
-      {
-        table: {
-          widths: ['25%', '75%'],
-          body: [
-            ['DERIVA A:', ' '],
-            ['MOTIVO:', ' '],
-            ['OBSERVACIONES:', ' ']
-          ]
-        },
-        margin: [0, 10]
-      },
-      {
-        text: 'REPORTE EMPRESA EXTERNA',
-        style: 'subheader',
-        margin: [0, 20, 0, 5]
-      },
-      {
-        table: {
-          widths: ['25%', '75%'],
-          body: [
-            ['FECHA:', ' '],
-            ['DESCRIPCIÓN:', ' '],
-            ['TIPO DOCUMENTO:', ' '],
-            ['N° DOCUMENTO:', ' '],
-            ['OBSERVACIONES:', ' ']
-          ]
-        },
-        margin: [0, 10]
-      },
-      {
-        text: 'IDENTIFICACIÓN DE RECEPCIÓN',
-        style: 'subheader',
-        margin: [0, 20, 0, 5]
-      },
-      {
-        table: {
-          widths: ['50%', '50%'],
-          body: [
-            ['FECHA:', ' '],
-            ['LIMPIEZA Y ORDEN:', 'Sí [ ] No [ ]'],
-            ['OBSERVACIONES:', ' ']
-          ]
-        },
-        margin: [0, 10]
-      }
-    ],
-    styles: {
-      header: {
-        fontSize: 18,
-        bold: true
-      },
-      subheader: {
-        fontSize: 12,
-        bold: true
-      }
-    }
-  };
-
-  const pdfDoc = printer.createPdfKitDocument(docDefinition);
-  pdfDoc.pipe(fs.createWriteStream('Solicitud_de_Mantenimiento-pdfmake.pdf'));
-  pdfDoc.end();
+export const getAllExternalReports = async (req, res) => {
+  try {
+    const requests = await ExternalReport.findAll();
+    return res.json(requests);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch requests' });
+  }
 };

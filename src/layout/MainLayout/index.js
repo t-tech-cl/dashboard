@@ -17,7 +17,7 @@ import { MenuOrientation } from 'config';
 import useConfig from 'hooks/useConfig';
 import { dispatch } from 'store';
 import { openDrawer } from 'store/reducers/menu';
-import ScrollIndicator from 'components/scrollIndicator';
+// import ScrollIndicator from 'components/scrollIndicator';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
@@ -52,7 +52,7 @@ const MainLayout = () => {
       {!isHorizontal ? <Drawer /> : <HorizontalBar />}
       <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1 }}>
         <Toolbar sx={{ mt: isHorizontal ? 8 : 'inherit' }} />
-        <ScrollIndicator />
+        {/* <ScrollIndicator /> */}
         <Container
           maxWidth={container ? 'xl' : false}
           sx={{

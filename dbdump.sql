@@ -103,3 +103,10 @@ WHERE applicantName IS NULL;
 ALTER TABLE Requests
 ADD COLUMN requestType ENUM('Preventiva', 'Correctiva', 'Instalaciones') NOT NULL DEFAULT 'Preventiva';
 
+ALTER TABLE Requests
+ADD COLUMN status ENUM('finished_delayed', 'finished', 'finished_upfront', 'delayed', 'ongoing')
+NOT NULL DEFAULT 'ongoing';
+
+UPDATE Requests
+SET status = 'ongoing'
+WHERE status IS NULL;

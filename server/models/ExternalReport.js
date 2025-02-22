@@ -16,11 +16,19 @@ const ExternalReport = sequelize.define(
     },
     reportDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false
+      allowNull: true
+    },
+    documentNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    documentType: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: true
     },
     assignedTo: {
       type: DataTypes.STRING,

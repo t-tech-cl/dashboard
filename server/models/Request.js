@@ -15,6 +15,11 @@ const Request = sequelize.define(
       allowNull: false,
       unique: true
     },
+    status: {
+      type: DataTypes.ENUM('finished_delayed', 'finished', 'finished_upfront', 'delayed', 'ongoing'),
+      allowNull: false,
+      defaultValue: 'ongoing'
+    },
     userID: {
       type: DataTypes.INTEGER,
       allowNull: false

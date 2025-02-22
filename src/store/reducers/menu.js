@@ -1,6 +1,6 @@
 // third-party
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import other from 'menu-items/other';
+import other from 'menu-items/maintenance';
 
 // project import
 // import axios from 'utils/axios';

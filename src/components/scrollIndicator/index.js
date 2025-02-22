@@ -34,7 +34,7 @@ const ScrollIndicator = () => {
           right: 0,
           height: 10,
           originX: 0,
-          backgroundColor: '#058478'
+          backgroundColor: '#23689b'
         }}
       />
     </motion.div>

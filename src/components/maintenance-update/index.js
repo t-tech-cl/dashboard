@@ -1,15 +1,15 @@
 import { Grid } from '@mui/material';
-import MaintenanceUpdateForm from 'components/forms/maintenance-update';
-import AuthCard from 'sections/auth/AuthCard';
+import Card from 'components/card';
+import SearchDocumentForm from 'components/forms/search-document';
 
-const MaintenanceUpdateComponent = () => {
+const SearchDocumentComponent = () => {
   return (
-    <Grid container justifyContent="center" alignItems="center">
-      <AuthCard>
-        <MaintenanceUpdateForm />
-      </AuthCard>
+    <Grid container justifyContent="center" alignItems="center" marginTop={10}>
+      <Card maxWidth={{ xs: 450, lg: 600 }}>
+        <SearchDocumentForm />
+      </Card>
     </Grid>
   );
 };
 
-export default MaintenanceUpdateComponent;
+export default SearchDocumentComponent;

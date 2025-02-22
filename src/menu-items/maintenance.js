@@ -14,7 +14,11 @@ import {
   StopOutlined,
   FormOutlined,
   IssuesCloseOutlined,
-  FilePdfOutlined
+  FilePdfOutlined,
+  SearchOutlined,
+  FileSearchOutlined,
+  DatabaseOutlined,
+  UsergroupAddOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -30,36 +34,40 @@ const icons = {
   DeploymentUnitOutlined,
   FormOutlined,
   IssuesCloseOutlined,
-  FilePdfOutlined
+  FilePdfOutlined,
+  SearchOutlined,
+  FileSearchOutlined,
+  DatabaseOutlined,
+  UsergroupAddOutlined
 };
 
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
 
 const other = {
   id: 'mantenimiento',
-  title: <FormattedMessage id="Mantenimiento" />,
+  title: <FormattedMessage id="Solicitud de Mantención" />,
   type: 'group',
   children: [
     {
       id: 'maintenance-request',
-      title: 'Solicitud',
+      title: 'Crear / Modificar',
       type: 'item',
       url: '/mantenimiento/solicitud',
       icon: icons.FormOutlined
     },
     {
       id: 'maintenance-update',
-      title: 'Actualización',
+      title: 'Buscar PDF',
       type: 'item',
-      url: '/mantenimiento/actualizacion',
-      icon: icons.IssuesCloseOutlined
+      url: '/mantenimiento/buscar-documento',
+      icon: icons.FileSearchOutlined
     },
     {
-      id: 'maintenance-request-pdf',
-      title: 'Solicitud',
+      id: 'visualize-db',
+      title: 'Base de datos',
       type: 'item',
-      url: '/mantenimiento/pdf-solicitud',
-      icon: icons.FilePdfOutlined
+      url: '/mantenimiento/base-de-datos',
+      icon: icons.DatabaseOutlined
     }
     // {
     //   id: 'menu-level',

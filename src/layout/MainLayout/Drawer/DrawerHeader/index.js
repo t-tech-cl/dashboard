@@ -6,7 +6,7 @@ import { Typography, useMediaQuery } from '@mui/material';
 
 // project import
 import DrawerHeaderStyled from './DrawerHeaderStyled';
-import Logo from 'components/logo';
+import Logo from 'assets/images/logo.png';
 import useConfig from 'hooks/useConfig';
 import { MenuOrientation } from 'config';
 
@@ -40,7 +40,7 @@ const DrawerHeader = ({ open }) => {
           alignItems: 'center'
         }}
       >
-        <Logo isIcon sx={{ width: 35, height: 35 }} />
+        <img src={Logo} alt="logo" style={{ height: 34, width: 34 }} />
         {open && <Typography variant="h3">T-TECH LTDA</Typography>}
       </div>
     </DrawerHeaderStyled>

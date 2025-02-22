@@ -27,5 +27,11 @@ module.exports = function override(config) {
     })
   ];
 
+  // Add image loader rule for PNG support
+  config.module.rules.push({
+    test: /\.(png|jpe?g|gif|svg)$/i,
+    type: 'asset/resource'
+  });
+
   return config;
 };

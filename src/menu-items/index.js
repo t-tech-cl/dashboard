@@ -3,7 +3,8 @@
 // import widget from './widget';
 // import formsTables from './forms-tables';
 // import chartsMap from './charts-map';
-import other from './other';
+import maintenance from './maintenance';
+// import user from './user';
 // import pages from './pages';
 
 // ==============================|| MENU ITEMS ||============================== //
@@ -15,7 +16,8 @@ const menuItems = {
     // formsTables,
     // chartsMap,
     // pages,
-    other
+    maintenance
+    // user
   ]
 };
 
