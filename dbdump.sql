@@ -38,31 +38,18 @@ CREATE TABLE Requests (
     cleaningObservations TEXT,
     FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
     FOREIGN KEY (lastUpdatedBy) REFERENCES Users(userID) ON DELETE SET NULL,
-    FOREIGN KEY (assignedTo) REFERENCES Users(userID) ON DELETE SET NULL
 );
 
--- Table to store manager evaluation and cleaning status (optional, based on your requirements)
-CREATE TABLE RequestEvaluations (
-    evaluationID INT AUTO_INCREMENT PRIMARY KEY,
-    requestID INT NOT NULL,
-    assignedTo VARCHAR(50), -- Link to the user assigned to handle the request
-    reason VARCHAR(255),
-    managerObservations TEXT,
-    isClean TINYINT(1), -- Changed to TINYINT(1) for boolean-like data
-    receptionDate DATE,
-    cleaningObservations TEXT,
-    FOREIGN KEY (requestID) REFERENCES Requests(requestID) ON DELETE CASCADE,
-    FOREIGN KEY (assignedTo) REFERENCES Users(userID) ON DELETE SET NULL
-);
-
-CREATE TABLE ExternalCompanyReports (
+CREATE TABLE ExternalReports (
     reportID INT AUTO_INCREMENT PRIMARY KEY,
     requestID INT NOT NULL, -- Link to the corresponding request
-    reportDate DATE NOT NULL, -- Fecha
-    description TEXT NOT NULL, -- Descripción
+    reportDate DATE, -- Fecha
+    description TEXT, -- Descripción
     assignedTo VARCHAR(50), -- Deriva a (linked request number or external assignee)
     reason VARCHAR(255), -- Motivo
     observations TEXT, -- Observaciones
+    documentNumber VARCHAR(255), -- Observaciones
+    documentType VARCHAR(255), -- Observaciones
     FOREIGN KEY (requestID) REFERENCES Requests(requestID) ON DELETE CASCADE
 );
 

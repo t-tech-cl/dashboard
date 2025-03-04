@@ -1,5 +1,5 @@
 import { Autocomplete, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Field } from 'react-final-form';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
@@ -7,25 +7,26 @@ import { getRequest, initializeRequest } from 'store/reducers/maintenanceRequest
 import colors from 'const/colors';
 
 const ApplicantSection = memo(({ form, initialValues }) => {
-  const { requestList } = useSelector((state) => state.maintenanceRequest);
   const { requestNumber, applicantName, applicantRole, applicantArea, status } = initialValues;
 
-  const handleOnChangeStatus = ({ target }) => form.change('status', target.value);
+  const [statusColor, setStatusColor] = useState(colors[status] || '#0070c0');
+  const [statusValue, setStatusValue] = useState(status);
+  const { requestList } = useSelector((state) => state.maintenanceRequest);
 
   const handleOnChangeRequestNumber = async ({ target }) => {
     if (!target.innerText) return;
 
     try {
+      form.reset();
+      form.initialize({
+        requestType: 'Preventiva',
+        isClean: 'si',
+        requestDate: null,
+        receptionDate: null,
+        status: 'ongoing',
+        externalReport: {}
+      });
       if (target.innerText === 'Nueva solicitud') {
-        form.reset();
-        form.initialize({
-          requestType: 'Preventiva',
-          isClean: 'si',
-          requestDate: null,
-          receptionDate: null,
-          status: 'ongoing',
-          externalReport: {}
-        });
         await initializeRequest();
         target.value = requestList[0].requestNumber;
       } else {
@@ -47,7 +48,7 @@ const ApplicantSection = memo(({ form, initialValues }) => {
   return (
     <Grid container flexDirection="column" rowGap={1}>
       <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}>
-        <Typography variant="h2" textAlign="center" gutterBottom>
+        <Typography variant="h3" textAlign="center" gutterBottom>
           Identificación del solicitante:
         </Typography>
       </motion.div>
@@ -77,10 +78,10 @@ const ApplicantSection = memo(({ form, initialValues }) => {
       </motion.div>
 
       <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1, duration: 0.5 }}>
-        <Field name="status" defaultValue={status}>
+        <Field name="status" initialValue={status}>
           {({ input }) => (
             <FormControl fullWidth>
-              <InputLabel id="status" sx={{ color: colors[status] }}>
+              <InputLabel id="status" sx={{ color: statusColor }}>
                 Estatus
               </InputLabel>
               <Select
@@ -88,13 +89,18 @@ const ApplicantSection = memo(({ form, initialValues }) => {
                 labelId="status"
                 name="status"
                 sx={{
-                  backgroundColor: colors[status],
+                  backgroundColor: statusColor,
                   color: '#000',
                   fontWeight: 'bold'
                 }}
                 id="demo-simple-select"
                 label="status"
-                onChange={handleOnChangeStatus}
+                defaultValue={statusValue}
+                onChange={({ target }) => {
+                  setStatusValue(target.value); // Update the value
+                  setStatusColor(colors[target.value] || '#0070c0'); // Update the color
+                  input.onChange(target.value);
+                }}
               >
                 {statusItems.map((item, i) => (
                   <MenuItem

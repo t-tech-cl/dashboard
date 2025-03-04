@@ -5,18 +5,36 @@ import { REQUESTS_ENDPOINTS } from 'const/urls';
 import axiosServices from 'utils/axios';
 import { Button, Grid, Tabs, Tab, Box, Card } from '@mui/material';
 import { motion } from 'framer-motion';
-import { exportToExcel, importFromExcel } from 'utils/exportXslx';
+// Import ExcelJS instead of XLSX
+import ExcelJS from 'exceljs';
+import moment from 'moment';
 
 const MaintenanceDB = () => {
   const [data, setData] = useState([]);
   const [externalReports, setExternalReports] = useState([]);
   const [tabIndex, setTabIndex] = useState(0);
+  const [templateLoading, setTemplateLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
+      const statusValue = {
+        finished_delayed: 'Concluido atrasado',
+        finished: 'Concluido',
+        finished_upfront: 'Concluido adelantado',
+        delayed: 'Atrasado',
+        ongoing: 'En desarrollo'
+      };
+
       try {
         const { data } = await axiosServices.get(REQUESTS_ENDPOINTS.ALL_REQUESTS);
-        setData(data);
+        const formattedData = data.map((item) => ({
+          ...item,
+          status: statusValue[item.status],
+          requestDate: moment(item.requestDate).format('DD-MM-YYYY'),
+          receptionDate: item.receptionDate ? moment(item.receptionDate).format('DD-MM-YYYY') : '',
+          lastUpdateDate: moment(item.lastUpdateDate).format('DD-MM-YYYY')
+        }));
+        setData(formattedData);
       } catch (error) {
         console.log(error);
       }
@@ -36,25 +54,15 @@ const MaintenanceDB = () => {
 
   const maintenanceColumns = [
     { accessorKey: 'requestID', header: 'ID' },
-    { accessorKey: 'requestNumber', header: 'N° Solicitud' },
-    { accessorKey: 'userID', header: 'ID Usuario' },
     { accessorKey: 'applicantName', header: 'Nombre de Solicitante' },
-    { accessorKey: 'applicantRole', header: 'Cargo' },
-    { accessorKey: 'applicantArea', header: 'Área' },
-    { accessorKey: 'requestDate', header: 'Fecha de Solicitud' },
-    { accessorKey: 'requestType', header: 'Tipo de Solicitud' },
-    { accessorKey: 'lastUpdateDate', header: 'Fecha de Actualización' },
     { accessorKey: 'description', header: 'Descripción' },
-    { accessorKey: 'equipmentArea', header: 'Área / Equipo' },
-    { accessorKey: 'brand', header: 'Marca' },
-    { accessorKey: 'location', header: 'Ubicación' },
-    { accessorKey: 'serialNumber', header: 'Número' },
+    { accessorKey: 'applicantArea', header: 'Área' },
+    { accessorKey: 'status', header: 'Estatus' },
     { accessorKey: 'assignedTo', header: 'Asignado a' },
-    { accessorKey: 'reason', header: 'Razón' },
-    { accessorKey: 'managerObservations', header: 'Observación del Jefe de Mantención' },
-    { accessorKey: 'isClean', header: 'Limpieza y Orden' },
-    { accessorKey: 'receptionDate', header: 'Fecha de Recepción' },
-    { accessorKey: 'cleaningObservations', header: 'Observación de Recepción' }
+    { accessorKey: 'requestDate', header: 'Fecha de Solicitud' },
+    { accessorKey: 'lastUpdateDate', header: 'Fecha de Actualización' },
+    { accessorKey: '', header: 'Fecha de Término' },
+    { accessorKey: 'receptionDate', header: 'Fecha de Término Real' }
   ];
 
   const externalReportColumns = [
@@ -79,20 +87,164 @@ const MaintenanceDB = () => {
   });
 
   const exportCSV = (tableData, fileName) => {
-    const csv = Papa.unparse(tableData);
+    const csv = Papa.unparse(tableData, { delimiter: ',' }); // Ensure ',' is used as separator
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${fileName}.csv`;
-    link.click();
+    const url = URL.createObjectURL(blob);
 
-    exportToExcel(tableData, tableData);
-    importFromExcel();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${fileName}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url); // Clean up the URL object
+  };
+
+  const exportWithTemplate = async () => {
+    try {
+      setTemplateLoading(true);
+
+      // Define the path to the template in public folder
+      const templatePath = tabIndex === 0 ? '/template/solicitud_mantencion_template.xlsx' : '/templates/reportes_externos_template.xlsx';
+
+      // Fetch the template file
+      const response = await fetch(templatePath);
+      const templateArrayBuffer = await response.arrayBuffer();
+
+      // Create a new workbook and load the template with full image support
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(templateArrayBuffer);
+
+      // Get the first worksheet
+      const worksheet = workbook.worksheets[0];
+
+      worksheet.getCell('C1').value = worksheet.getCell('C1').value.replace('{year}', moment().format('YYYY'));
+      worksheet.getCell('K1').value = worksheet.getCell('K1').value.replace('{date}', moment().format('DD-MM-YYYY'));
+      worksheet.getCell('K1').value = worksheet.getCell('K1').value.replace('{date}', moment().format('DD-MM-YYYY'));
+
+      // Store the original images and their positions
+      const originalImages = worksheet.getImages();
+      console.log('Original images in template:', originalImages);
+
+      // Current data to export
+      const currentData = tabIndex === 0 ? data : externalReports;
+
+      // Start filling data from cell A4 (ExcelJS uses 1-based indexing)
+      const startRow = 3;
+
+      // Get columns based on the current tab
+      const columns = tabIndex === 0 ? maintenanceColumns : externalReportColumns;
+
+      // Fill the data into the worksheet
+      currentData.forEach((row, rowIndex) => {
+        // Only modify a limited number of rows to avoid affecting image positioning
+        if (rowIndex < 20) {
+          // Adjust this limit based on your template design
+          columns.forEach((column, colIndex) => {
+            const cellRow = startRow + rowIndex;
+            const cellCol = colIndex + 1;
+
+            try {
+              const cell = worksheet.getCell(cellRow, cellCol);
+              const cellValue = row[column.accessorKey];
+
+              // Only update cells if they don't have formulas
+              if (!cell.formula && !cell.sharedFormula) {
+                if (cellValue !== undefined && cellValue !== null) {
+                  // Use text values to avoid formatting issues
+                  cell.value = String(cellValue);
+                } else {
+                  cell.value = '';
+                }
+              }
+            } catch (cellError) {
+              console.warn(`Skipping cell at ${cellRow},${cellCol} due to error:`, cellError);
+            }
+          });
+        }
+      });
+
+      // Check if images still exist after data filling
+      const remainingImages = worksheet.getImages();
+      console.log('Images after data filling:', remainingImages);
+
+      // If images were lost, re-add them
+      if (originalImages.length > 0 && remainingImages.length === 0) {
+        console.log('Re-adding lost images...');
+
+        // For each original image, add it back to the worksheet
+        for (const img of originalImages) {
+          try {
+            // The image data is stored in the media property of the workbook
+            const imageId = img.imageId;
+            const imageData = workbook.media.find((m) => m.index === imageId);
+
+            if (imageData) {
+              // Re-add the image at its original position
+              worksheet.addImage({
+                imageId: imageId,
+                tl: { col: img.range.tl.col, row: img.range.tl.row },
+                br: { col: img.range.br.col, row: img.range.br.row },
+                editAs: img.editAs || 'oneCell'
+              });
+            }
+          } catch (imgError) {
+            console.error('Error re-adding image:', imgError);
+          }
+        }
+      }
+
+      // Generate the file name
+      const fileName = tabIndex === 0 ? 'solicitud_mantencion' : 'reportes_externos';
+
+      // Use options to preserve images and formatting
+      const options = {
+        filename: `${fileName}.xlsx`,
+        useStyles: true,
+        useSharedStrings: true,
+        bookImages: true
+      };
+
+      // Write to buffer with options
+      const buffer = await workbook.xlsx.writeBuffer(options);
+
+      // Create a blob and download
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${fileName}_filled.xlsx`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      console.log('Excel export completed successfully with image preservation');
+    } catch (error) {
+      console.error('Error exporting with template:', error);
+      alert('Error al exportar con la plantilla: ' + error.message);
+    } finally {
+      setTemplateLoading(false);
+    }
+  };
+
+  const statusItems = {
+    'En desarrollo': '#0070c0',
+    Concluido: '#91d050',
+    'Concluido adelantado': '#bfbfbf',
+    'Concluido atrasado': '#ffc000',
+    Atrasado: '#ff0100'
   };
 
   return (
     <Box sx={{ padding: 2 }}>
       <Grid container justifyContent="flex-end" columnGap={2} paddingY={2}>
+        {tabIndex === 0 && (
+          <Button variant="contained" color="primary" onClick={exportWithTemplate} disabled={templateLoading}>
+            {templateLoading ? 'Exportando...' : 'Exportar con Plantilla'}
+          </Button>
+        )}
         <Button
           variant="contained"
           color="info"
@@ -136,6 +288,11 @@ const MaintenanceDB = () => {
                     <td
                       key={cell.id}
                       style={{
+                        ...(cell.id.includes('status') && {
+                          color: 'black',
+                          fontWeight: 'semibold',
+                          backgroundColor: statusItems[cell.getValue()]
+                        }),
                         border: '1px solid #fff',
                         padding: '8px',
                         textOverflow: 'ellipsis',

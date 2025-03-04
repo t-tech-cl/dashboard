@@ -2,22 +2,14 @@ import { FormControl, FormControlLabel, Grid, InputLabel, Radio, RadioGroup, Tex
 import { DatePicker } from '@mui/x-date-pickers';
 import { motion } from 'framer-motion';
 import moment from 'moment';
-import React, { memo, useEffect } from 'react';
+import React, { memo } from 'react';
 import { Field } from 'react-final-form';
 
-const ApplicantRequestReceptionSection = memo(({ form, initialValues }) => {
+const ApplicantRequestReceptionSection = memo(({ initialValues }) => {
   const { receptionDate, isClean, cleaningObservations } = initialValues;
 
-  const unformattedReceptionDate = moment(receptionDate, 'DD-MM-YYYY');
-
-  const handleOnChangeDate = (date) => {
-    form.change('receptionDate', date.valueOf());
-  };
-
-  useEffect(() => {
-    if (receptionDate && unformattedReceptionDate.isValid()) form.change('receptionDate', unformattedReceptionDate.valueOf());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, unformattedReceptionDate]);
+  // Format the initial date value once
+  const initialDateValue = receptionDate ? moment(receptionDate, 'YYYY-MM-DD').valueOf() : null;
 
   return (
     <Grid container rowGap={2}>
@@ -41,11 +33,12 @@ const ApplicantRequestReceptionSection = memo(({ form, initialValues }) => {
         <Field
           id="receptionDate"
           name="receptionDate"
-          render={() => (
+          initialValue={initialDateValue}
+          render={({ input }) => (
             <DatePicker
+              value={input.value ? moment(input.value) : null}
+              onChange={(date) => input.onChange(date.valueOf())}
               label="Fecha:"
-              onChange={handleOnChangeDate}
-              value={unformattedReceptionDate.isValid() ? unformattedReceptionDate : null}
               format="DD-MM-YYYY"
               sx={{ width: '100%' }}
             />
@@ -62,12 +55,12 @@ const ApplicantRequestReceptionSection = memo(({ form, initialValues }) => {
         <Field
           id="isClean"
           name="isClean"
-          defaultValue="si"
+          initialValue={isClean ? 'si' : 'no'}
           render={({ input }) => (
             <Grid container flexDirection="row" alignItems="center" columnGap={1}>
               <InputLabel>Limpieza y Orden:</InputLabel>
               <FormControl component="fieldset">
-                <RadioGroup {...input} defaultValue={isClean ? 'si' : 'no'}>
+                <RadioGroup {...input}>
                   <Grid flexDirection="column" columnGap={2}>
                     <FormControlLabel value="si" control={<Radio />} label="Si" />
                     <FormControlLabel value="no" control={<Radio />} label="No" />

@@ -12,7 +12,7 @@ const SearchDocumentForm = () => {
   const [request, setRequest] = useState({ show: false });
   const { requestList } = useSelector((state) => state.maintenanceRequest);
 
-  const handleOnSubmit = (value) => setRequestNumber(value);
+  const handleOnSubmit = (value) => setRequest(value);
   const formatText = (number) => `${number}`.padStart(6, 0);
 
   const handleOnChange = (input, value, reason) => {

@@ -2,24 +2,14 @@ import { FormControlLabel, Grid, InputLabel, Radio, RadioGroup, TextField, Typog
 import { DatePicker } from '@mui/x-date-pickers';
 import { motion } from 'framer-motion';
 import moment from 'moment';
-import React, { memo, useEffect } from 'react';
+import React, { memo } from 'react';
 import { Field } from 'react-final-form';
 
-const ApplicantRequestSection = memo(({ form, initialValues }) => {
+const ApplicantRequestSection = memo(({ initialValues }) => {
   const { requestDate, requestType, equipmentArea, brand, location, serialNumber } = initialValues;
 
-  const unformattedRequestDate = moment(requestDate, 'YYYY-MM-DD');
-
-  const handleOnChangeDate = (date) => form.change('requestDate', date.valueOf());
-
-  useEffect(() => {
-    if (requestDate && unformattedRequestDate.isValid()) {
-      form.change('requestDate', unformattedRequestDate.valueOf());
-    } else {
-      form.change('requestDate', moment());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requestDate]);
+  // Format the initial date value once
+  const initialDateValue = requestDate ? moment(requestDate, 'YYYY-MM-DD').valueOf() : null;
 
   return (
     <Grid container rowGap={2}>
@@ -43,11 +33,12 @@ const ApplicantRequestSection = memo(({ form, initialValues }) => {
         <Field
           id="requestDate"
           name="requestDate"
-          render={() => (
+          initialValue={initialDateValue}
+          render={({ input }) => (
             <DatePicker
-              value={unformattedRequestDate.isValid() ? unformattedRequestDate : moment()}
+              value={input.value ? moment(input.value) : moment()}
+              onChange={(date) => input.onChange(date.valueOf())}
               label="Fecha Solicitud:"
-              onChange={handleOnChangeDate}
               sx={{ width: '100%' }}
             />
           )}

@@ -121,7 +121,7 @@ const PdfDocument = ({ request, pdfRef }) => {
               </div>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, paddingRight: 0.5 }}>
                 <span style={styles.title}>N° SOLICITUD</span>
               </td>
               <td style={styles.tdCenter}>{request.requestNumber}</td>
@@ -129,42 +129,44 @@ const PdfDocument = ({ request, pdfRef }) => {
                 <span style={(styles.title, { textAlign: 'center', width: '100%', borderBottom: 2 })}>FIRMA</span>
               </td>
             </tr>
-            <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
-                <span style={styles.title}>NOMBRE</span>
-              </td>
-              <td style={styles.tdCenter}>{request.applicantName}</td>
-              <td style={styles.td} />
-            </tr>
-            <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
-                <span style={styles.title}>CARGO</span>
-              </td>
-              <td style={styles.tdCenter}>{request.applicantRole}</td>
-              <td style={styles.td}></td>
-            </tr>
-            <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
-                <span style={styles.title}>ÁREA</span>
-              </td>
-              <td style={styles.tdCenter}>{request.applicantArea}</td>
-              <td style={styles.td}></td>
-            </tr>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', flex: 2 }}>
+                <tr style={styles.tr}>
+                  <td style={styles.tdTitle}>
+                    <span style={styles.title}>NOMBRE</span>
+                  </td>
+                  <td style={styles.tdCenter}>{request.applicantName}</td>
+                </tr>
+                <tr style={styles.tr}>
+                  <td style={styles.tdTitle}>
+                    <span style={styles.title}>CARGO</span>
+                  </td>
+                  <td style={styles.tdCenter}>{request.applicantRole}</td>
+                </tr>
+                <tr style={styles.tr}>
+                  <td style={styles.tdTitle}>
+                    <span style={styles.title}>ÁREA</span>
+                  </td>
+                  <td style={styles.tdCenter}>{request.applicantArea}</td>
+                </tr>
+              </div>
+              <div style={{ ...styles.td, flex: 1, border: '1px solid #000', borderCollapse: 'collapse' }} />
+            </div>
             <tr style={{ flex: 1, width: '100%' }}>
               <div style={{ color: '#000', border: '1px solid #000', borderCollapse: 'collapse', textAlign: 'center', fontWeight: 'bold' }}>
                 IDENTIFICACIÓN DE LA SOLICITUD
               </div>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, paddingRight: -0.5 }}>
                 <span style={styles.title}>FECHA SOLICITUD</span>
               </td>
               <td style={styles.tdCenter}>{moment(request.requestDate).format('DD-MM-YYYY')}</td>
-              <td style={styles.td}></td>
+              <td style={{ ...styles.td, border: '1px solid #000', borderCollapse: 'collapse' }}></td>
             </tr>
 
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, padding: 0, paddingRight: 1 }}>
                 <span style={styles.title}>TIPO DE SOLICITUD</span>
               </td>
               <td style={{ ...styles.tdCenter, columnGap: 20, display: 'flex', justifyContent: 'center', flex: 2 }}>
@@ -175,34 +177,45 @@ const PdfDocument = ({ request, pdfRef }) => {
                   </label>
                 ))}
               </td>
-              <td style={styles.td}></td>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, padding: 0, paddingRight: 3 }}>
                 <span style={styles.title}>DESCRIPCIÓN</span>
               </td>
-              <td style={styles.tdCenter}>{request.description}</td>
-              <td style={styles.td}></td>
+              <td style={{ ...styles.tdCenter, paddingRight: 2 }}>{request.description}</td>
+              <td
+                style={{
+                  ...styles.td,
+                  padding: 0,
+                  flex: 1,
+                  border: '1px solid #000',
+                  borderCollapse: 'collapse'
+                }}
+              ></td>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, padding: 0 }}>
                 <span style={styles.title}>EQUIPO/ÁREA</span>
               </td>
               <td style={styles.tdCenter}>{request.equipmentArea}</td>
-              <td style={styles.tdTitle}>
-                <span style={styles.title}>MARCA</span>
+              <td style={{ flex: 1, flexDirection: 'row', display: 'flex', padding: 0 }}>
+                <td style={{ ...styles.tdTitle, justifyContent: 'center' }}>
+                  <span style={styles.title}>MARCA</span>
+                </td>
+                <td style={{ ...styles.tdCenter, justifyContent: 'center' }}>{request.brand}</td>
               </td>
-              <td style={styles.tdCenter}>{request.brand}</td>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, padding: 0, paddingRight: 1 }}>
                 <span style={styles.title}>UBICACIÓN</span>
               </td>
               <td style={styles.tdCenter}>{request.location}</td>
-              <td style={styles.tdTitle}>
-                <span style={styles.title}>NÚMERO</span>
+              <td style={{ flex: 1, flexDirection: 'row', display: 'flex', padding: 0 }}>
+                <td style={{ ...styles.tdTitle, justifyContent: 'center' }}>
+                  <span style={styles.title}>NÚMERO</span>
+                </td>
+                <td style={styles.tdCenter}>{request.serialNumber}</td>
               </td>
-              <td style={styles.tdCenter}>{request.serialNumber}</td>
             </tr>
             <tr style={{ flex: 1, width: '100%' }}>
               <div style={{ color: '#000', border: '1px solid #000', borderCollapse: 'collapse', textAlign: 'center', fontWeight: 'bold' }}>
@@ -214,10 +227,10 @@ const PdfDocument = ({ request, pdfRef }) => {
                 <span style={styles.title}>DERIVA A</span>
               </td>
               <td style={styles.tdCenter}>{request.assignedTo}</td>
-              <td style={styles.td}></td>
+              <td style={{ ...styles.td, color: '#000', border: '1px solid #000', borderCollapse: 'collapse' }}></td>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, alignItems: 'center' }}>
                 <span style={styles.title}>MOTIVO</span>
               </td>
               <td
@@ -245,7 +258,7 @@ const PdfDocument = ({ request, pdfRef }) => {
               </td>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, alignItems: 'center' }}>
                 <span style={styles.title}>OBSERVACIONES</span>
               </td>
               <td style={{ ...styles.tdCenter, flex: 2 }}>
@@ -272,7 +285,7 @@ const PdfDocument = ({ request, pdfRef }) => {
               </div>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, paddingRight: 3 }}>
                 <span style={styles.title}>FECHA</span>
               </td>
               <td style={styles.tdCenter}>{moment(request.externalReport.reportDate).format('DD-MM-YYYY')}</td>
@@ -283,16 +296,16 @@ const PdfDocument = ({ request, pdfRef }) => {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'row' }}>
               <tr style={{ flex: 2, display: 'flex', flexDirection: 'column' }}>
                 <tr style={styles.tr}>
-                  <td style={styles.tdTitle}>
+                  <td style={{ ...styles.tdTitle, paddingRight: 3 }}>
                     <span style={styles.title}>TIPO DOCUMENTO</span>
                   </td>
                   <td style={styles.tdCenter}>{request.externalReport.documentType}</td>
                 </tr>
                 <tr style={styles.tr}>
-                  <td style={styles.tdTitle}>
+                  <td style={{ ...styles.tdTitle, paddingRight: 3 }}>
                     <span style={styles.title}>N° DOCUMENTO</span>
                   </td>
-                  <td style={styles.tdCenter}>{request.externalReport.documentNumber}</td>
+                  <td style={{ ...styles.tdCenter }}>{request.externalReport.documentNumber}</td>
                 </tr>
               </tr>
               <tr style={{ flex: 1, display: 'flex' }}>
@@ -302,10 +315,10 @@ const PdfDocument = ({ request, pdfRef }) => {
               </tr>
             </div>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, paddingTop: 1, alignItems: 'center' }}>
                 <span style={styles.title}>OBSERVACIONES</span>
               </td>
-              <td style={{ ...styles.tdCenter, flex: 2, marginRight: 1 }}>
+              <td style={{ ...styles.tdCenter, flex: 2, padding: 0 }}>
                 <textarea
                   disabled
                   rows={2}
@@ -330,17 +343,16 @@ const PdfDocument = ({ request, pdfRef }) => {
               </div>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, flex: 1 }}>
                 <span style={styles.title}>FECHA</span>
               </td>
-              <td style={styles.tdCenter}>{moment(request.receptionDate).format('DD-MM-YYYY')}</td>
-              <td style={styles.td}></td>
+              <td style={{ ...styles.tdCenter, flex: 2 }}>{moment(request.receptionDate).format('DD-MM-YYYY')}</td>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, flex: 1 }}>
                 <span style={styles.title}>LIMPIEZA Y ORDEN</span>
               </td>
-              <td style={{ ...styles.tdCenter, columnGap: 20, display: 'flex', justifyContent: 'center', flex: 1 }}>
+              <td style={{ ...styles.tdCenter, columnGap: 20, display: 'flex', justifyContent: 'center', flex: 2 }}>
                 {[
                   { label: 'Sí', value: true },
                   { label: 'No', value: false }
@@ -351,13 +363,12 @@ const PdfDocument = ({ request, pdfRef }) => {
                   </label>
                 ))}
               </td>
-              <td style={styles.td}></td>
             </tr>
             <tr style={styles.tr}>
-              <td style={styles.tdTitle}>
+              <td style={{ ...styles.tdTitle, paddingTop: 1, alignItems: 'center' }}>
                 <span style={styles.title}>OBSERVACIONES</span>
               </td>
-              <td style={{ ...styles.tdCenter, flex: 2, marginRight: 5 }}>
+              <td style={{ ...styles.tdCenter, flex: 2, padding: 0 }}>
                 <textarea
                   disabled
                   rows={2}
@@ -376,11 +387,26 @@ const PdfDocument = ({ request, pdfRef }) => {
               </td>
             </tr>
             <tr style={{ flex: 1, width: '100%' }}>
-              <div style={{ color: '#000', border: '1px solid #000', borderCollapse: 'collapse', textAlign: 'center', fontWeight: 'bold' }}>
+              <div
+                style={{
+                  color: '#000',
+                  border: '1px solid #000',
+                  borderCollapse: 'collapse',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  padding: 0
+                }}
+              >
                 RECEPCIÓN CONFORME NOMBRE/FIRMA
               </div>
             </tr>
-            <tr>
+            <tr
+              style={{
+                color: '#000',
+                border: '1px solid #000',
+                borderCollapse: 'collapse'
+              }}
+            >
               <td style={{ ...styles.tdCenter, flex: 2, paddingLeft: 20, paddingRight: 20, paddingTop: 10 }}>
                 <textarea
                   disabled

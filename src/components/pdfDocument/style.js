@@ -52,13 +52,15 @@ const styles = StyleSheet.create({
     borderCollapse: 'collapse'
   },
   td: {
-    flex: 1
+    flex: 1,
+    padding: 0
   },
   tdCenter: {
     flex: 1,
     textAlign: 'center',
     border: '1px solid #000',
-    borderCollapse: 'collapse'
+    borderCollapse: 'collapse',
+    padding: 0
   },
   title: {
     paddingLeft: 20

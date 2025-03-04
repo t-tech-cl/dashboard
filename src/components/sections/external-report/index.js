@@ -2,21 +2,15 @@ import { Grid, InputLabel, TextField, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { motion } from 'framer-motion';
 import moment from 'moment';
-import React, { memo, useEffect } from 'react';
+import React, { memo } from 'react';
 import { Field } from 'react-final-form';
 
-const ApplicantExternalReportSection = memo(({ form, initialValues }) => {
-  const {
-    externalReport: { reportDate, description, assignedTo, reason, observations }
-  } = initialValues;
+const ApplicantExternalReportSection = memo(({ initialValues }) => {
+  const { externalReport = {} } = initialValues;
+  const { reportDate, description, assignedTo, reason, observations } = externalReport;
 
-  const unformattedReportDate = moment(reportDate, 'YYYY-MM-DD');
-  const handleOnChangeDate = (date) => form.change('reportDate', date.valueOf());
-
-  useEffect(() => {
-    if (reportDate && unformattedReportDate.isValid()) form.change('reportDate', unformattedReportDate.valueOf());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, unformattedReportDate]);
+  // Format the initial date value once
+  const initialDateValue = reportDate ? moment(reportDate, 'YYYY-MM-DD').valueOf() : null;
 
   return (
     <Grid container rowGap={2}>
@@ -40,11 +34,12 @@ const ApplicantExternalReportSection = memo(({ form, initialValues }) => {
         <Field
           id="reportDate"
           name="reportDate"
-          render={() => (
+          initialValue={initialDateValue}
+          render={({ input }) => (
             <DatePicker
-              onChange={handleOnChangeDate}
+              value={input.value ? moment(input.value) : null}
+              onChange={(date) => input.onChange(date.valueOf())}
               label="Fecha:"
-              defaultValue={unformattedReportDate.isValid() ? unformattedReportDate : null}
               sx={{ width: '100%' }}
             />
           )}

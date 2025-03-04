@@ -13,6 +13,7 @@ import ApplicantRequestReceptionSection from 'components/sections/reception';
 import AuthContext from 'contexts/AuthContext';
 import Card from 'components/card';
 import { isMobile } from 'react-device-detect';
+import moment from 'moment';
 
 const LongForm = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -27,11 +28,13 @@ const LongForm = () => {
 
   const initialValues = useMemo(
     () => ({
+      isClean: true,
+      status: 'ongoing',
       ...request,
+      requestDate: request?.requestDate || moment(),
+      reportDate: request?.reportDate || moment(),
       userID: user?.userID,
-      requestNumber,
-      isClean: 'si',
-      status: 'ongoing'
+      requestNumber
     }),
     [requestNumber, request, user?.userID]
   );
@@ -81,9 +84,9 @@ const LongForm = () => {
 
   const handleOnSubmit = async (values, form) => {
     await updateRequest({ requestNumber, userID: user?.userID, ...values });
-    form.reset({ requestNumber, userID: user?.userID, externalReport: {} });
 
-    await getLastRequest();
+    await Promise.all([getAllRequests(), getLastRequest()]);
+    form.reset({ requestNumber, userID: user?.userID, externalReport: {} });
 
     sectionRefs.current[0].scrollIntoView({
       behavior: 'smooth',
@@ -147,9 +150,9 @@ const LongForm = () => {
       [handlePreviousSection, handleNextSection, initialValues]
     ),
     useCallback(
-      ({ form }) => (
+      ({ form, values }) => (
         <Card>
-          <ApplicantExternalReportSection form={form} initialValues={initialValues} />
+          <ApplicantExternalReportSection form={form} initialValues={initialValues} values={values} />
           <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
             <Button onClick={handlePreviousSection} sx={{ mr: 1 }}>
               Regresar
@@ -165,7 +168,7 @@ const LongForm = () => {
     useCallback(
       ({ form, values, onSubmit }) => (
         <Card>
-          <ApplicantRequestReceptionSection form={form} onSubmit={onSubmit} values={values} initialValues={initialValues} />
+          <ApplicantRequestReceptionSection form={form} initialValues={initialValues} values={values} />
           <Grid container flexDirection="row" justifyContent="flex-end" columnGap={2} pt={2}>
             <Button onClick={handlePreviousSection} sx={{ mr: 1 }}>
               Regresar
@@ -227,14 +230,14 @@ const LongForm = () => {
         <Stepper
           activeStep={activeStep}
           orientation="horizontal"
-          sx={{ position: 'fixed', alignContent: 'center', paddingTop: 2, left: 15, right: 5 }}
+          sx={{ position: 'fixed', alignContent: 'center', paddingTop: 2, left: 15, right: 5, zIndex: 100 }}
         >
-          {stepLabels.map((index) => (
+          {stepLabels.map((_, index) => (
             <Step key={index}>
               <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 1, duration: 1 }}>
                 <StepLabel
-                  ref={(el) => (sectionLabelRefs.current[index] = el)}
                   onClick={() => handleClickLabel(index)}
+                  ref={(el) => (sectionLabelRefs.current[index] = el)}
                   style={{ zIndex: 99, cursor: 'pointer' }}
                   StepIconProps={{
                     sx: {
