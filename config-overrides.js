@@ -2,32 +2,32 @@ const webpack = require('webpack');
 const WorkBoxPlugin = require('workbox-webpack-plugin');
 
 module.exports = function override(config) {
+  // Ensure fallback dependencies are properly resolved
   config.resolve.fallback = {
-    process: require.resolve('process/browser'),
-    // zlib: require.resolve('browserify-zlib'),
-    stream: require.resolve('stream-browserify'),
-    crypto: require.resolve('crypto-browserify'),
-    util: require.resolve('util'),
-    buffer: require.resolve('buffer')
-    // asset: require.resolve('assert')
+    process: require.resolve('process/browser.js'),
+    stream: require.resolve('stream-browserify/index.js'),
+    crypto: require.resolve('crypto-browserify/index.js'),
+    util: require.resolve('util/util.js'),
+    buffer: require.resolve('buffer/index.js')
   };
 
-  // https://stackoverflow.com/questions/69135310/workaround-for-cache-size-limit-in-create-react-app-pwa-service-worker
+  // Workbox plugin fix for large cache sizes in service workers
   config.plugins.forEach((plugin) => {
     if (plugin instanceof WorkBoxPlugin.InjectManifest) {
-      plugin.config.maximumFileSizeToCacheInBytes = 50 * 1024 * 1024;
+      plugin.config.maximumFileSizeToCacheInBytes = 50 * 1024 * 1024; // 50MB
     }
   });
 
+  // Ensure ProvidePlugin is correctly configured
   config.plugins = [
     ...config.plugins,
     new webpack.ProvidePlugin({
       process: 'process/browser.js',
-      Buffer: ['buffer', 'Buffer']
+      Buffer: ['buffer/index.js', 'Buffer']
     })
   ];
 
-  // Add image loader rule for PNG support
+  // Ensure Webpack properly handles images
   config.module.rules.push({
     test: /\.(png|jpe?g|gif|svg)$/i,
     type: 'asset/resource'

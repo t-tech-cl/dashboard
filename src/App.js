@@ -19,9 +19,6 @@ import { fetchMenu } from 'store/reducers/menu';
 // auth provider
 import { AuthProvider } from 'contexts/AuthContext';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-// import { FirebaseProvider as AuthProvider } from 'contexts/FirebaseContext';
-// import { AWSCognitoProvider as AuthProvider } from 'contexts/AWSCognitoContext';
-// import { Auth0Provider as AuthProvider } from 'contexts/Auth0Context';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL  ||============================== //
 

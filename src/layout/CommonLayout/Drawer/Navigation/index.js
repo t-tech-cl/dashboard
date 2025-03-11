@@ -21,9 +21,8 @@ const Navigation = ({ searchValue }) => {
 
       parentMenu.children?.forEach((child) => {
         if (child.search?.trim().toLowerCase().includes(searchValue)) {
-          // todo: consider other filed then id
-          // if match
-          matchedChildren.push(child); // get the filter menuitem and push it to children
+          // Match found in search text, add this item
+          matchedChildren.push(child);
         }
       });
 

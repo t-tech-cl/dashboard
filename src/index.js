@@ -29,7 +29,7 @@ root.render(
   <ReduxProvider store={store}>
     <PersistGate loading={null} persistor={persister}>
       <ConfigProvider>
-        <BrowserRouter>
+        <BrowserRouter basename='/dashboard'>
           <App />
         </BrowserRouter>
       </ConfigProvider>
