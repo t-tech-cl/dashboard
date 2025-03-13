@@ -90,9 +90,8 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const register = async (email, password, firstname, lastname, queryParams) => {
+  const register = async (email, password, firstname, lastname) => {
     // todo: this flow need to be recode as it not verified
-    const role = queryParams.get('role');
     const response = await axios.post(
       ACCOUNT_ENDPOINTS.REGISTER,
       {
@@ -101,7 +100,6 @@ export const AuthProvider = ({ children }) => {
         firstname,
         lastname
       },
-      { params: { role } }
     );
     let users = response.data;
 

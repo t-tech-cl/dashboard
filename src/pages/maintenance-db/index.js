@@ -3,17 +3,23 @@ import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-tabl
 import Papa from 'papaparse';
 import { REQUESTS_ENDPOINTS } from 'const/urls';
 import axiosServices from 'utils/axios';
-import { Button, Grid, Tabs, Tab, Box, Card } from '@mui/material';
+import { Button, Grid, Tabs, Tab, Box, Card, Typography, Chip } from '@mui/material';
 import { motion } from 'framer-motion';
 // Import ExcelJS instead of XLSX
 import ExcelJS from 'exceljs';
 import moment from 'moment';
+import useAuth from 'hooks/useAuth';
+import { InfoCircleOutlined, LockOutlined } from '@ant-design/icons';
 
 const MaintenanceDB = () => {
   const [data, setData] = useState([]);
   const [externalReports, setExternalReports] = useState([]);
   const [tabIndex, setTabIndex] = useState(0);
   const [templateLoading, setTemplateLoading] = useState(false);
+  const { user } = useAuth();
+  
+  // Check if user has edit permissions (Admin or Manager)
+  const hasEditPermission = user && (user.role === 'Admin' || user.role === 'Manager');
 
   useEffect(() => {
     (async () => {
@@ -239,20 +245,65 @@ const MaintenanceDB = () => {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <Grid container justifyContent="flex-end" columnGap={2} paddingY={2}>
-        {tabIndex === 0 && (
-          <Button variant="contained" color="primary" onClick={exportWithTemplate} disabled={templateLoading}>
-            {templateLoading ? 'Exportando...' : 'Exportar con Plantilla'}
-          </Button>
-        )}
-        <Button
-          variant="contained"
-          color="info"
-          onClick={() => exportCSV(tabIndex === 0 ? data : externalReports, tabIndex === 0 ? 'solicitud_mantencion' : 'reportes_externos')}
+      {!hasEditPermission && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          Exportar CSV
-        </Button>
+          <Grid container spacing={2} alignItems="center" sx={{ mb: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
+            <Grid item>
+              <LockOutlined style={{ fontSize: '1.5rem', color: 'info.main' }} />
+            </Grid>
+            <Grid item xs>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'info.dark' }}>
+                Modo solo lectura
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Como usuario con rol {user?.role}, solo tienes acceso de lectura a esta información.
+              </Typography>
+            </Grid>
+          </Grid>
+        </motion.div>
+      )}
+      
+      <Grid container justifyContent="space-between" alignItems="center" paddingY={2}>
+        <Grid item>
+          <Typography variant="h3" component="h1">
+            Base de datos de mantenimiento
+            {!hasEditPermission && (
+              <Chip
+                icon={<InfoCircleOutlined />}
+                label="Solo lectura"
+                size="small"
+                color="info"
+                sx={{ ml: 1, verticalAlign: 'middle' }}
+              />
+            )}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Grid container spacing={2}>
+            {hasEditPermission && tabIndex === 0 && (
+              <Grid item>
+                <Button variant="contained" color="primary" onClick={exportWithTemplate} disabled={templateLoading}>
+                  {templateLoading ? 'Exportando...' : 'Exportar con Plantilla'}
+                </Button>
+              </Grid>
+            )}
+            <Grid item>
+              <Button
+                variant="contained"
+                color="info"
+                onClick={() => exportCSV(tabIndex === 0 ? data : externalReports, tabIndex === 0 ? 'solicitud_mantencion' : 'reportes_externos')}
+              >
+                Exportar CSV
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
+      
       <Card sx={{ overflowX: 'auto', maxWidth: '100%', marginTop: 2, justifyContent: 'center', display: 'flex', flexDirection: 'column' }}>
         <Tabs value={tabIndex} onChange={(e, newIndex) => setTabIndex(newIndex)} sx={{ justifySelf: 'center', width: '100%' }}>
           <Tab label="Solicitudes de Mantención" sx={{ fontWeight: 'bold', flex: 1, maxWidth: 'unset' }} />

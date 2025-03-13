@@ -320,8 +320,8 @@ const UserRoles = () => {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+                  transition={{ duration: 0.5 }}
+                >
         <Typography variant="h2" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <UserSwitchOutlined style={{ marginRight: '12px', fontSize: '1.2em' }} />
           Administración de roles y usuarios
@@ -482,8 +482,8 @@ const UserRoles = () => {
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ duration: 0.5 }}
-              >
+                  transition={{ duration: 0.5 }}
+                >
                 <MailOutlined style={{ fontSize: '4rem', opacity: 0.5 }} />
               </motion.div>
               <Typography variant="h5" sx={{ mt: 2, opacity: 0.7 }}>
@@ -582,7 +582,7 @@ const UserRoles = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              style={{
+                      style={{
                 position: 'fixed',
                 top: '50%',
                 left: '50%',

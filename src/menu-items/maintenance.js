@@ -53,21 +53,24 @@ const other = {
       title: 'Crear / Modificar',
       type: 'item',
       url: '/mantenimiento/solicitud',
-      icon: icons.FormOutlined
+      icon: icons.FormOutlined,
+      renderFor: ['Admin', 'Manager']
     },
     {
       id: 'maintenance-update',
       title: 'Buscar PDF',
       type: 'item',
       url: '/mantenimiento/buscar-documento',
-      icon: icons.FileSearchOutlined
+      icon: icons.FileSearchOutlined,
+      renderFor: ['Admin', 'Manager', 'User']
     },
     {
       id: 'visualize-db',
       title: 'Base de datos',
       type: 'item',
       url: '/mantenimiento/base-de-datos',
-      icon: icons.DatabaseOutlined
+      icon: icons.DatabaseOutlined,
+      renderFor: ['Admin', 'Manager', 'User']
     }
     // {
     //   id: 'menu-level',

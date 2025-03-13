@@ -3,31 +3,78 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import nodemailer from 'nodemailer';
 
-// Email configuration
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER || 'notification@t-tech.cl',
-    pass: process.env.EMAIL_PASSWORD || 'your_email_password'
-  }
-});
+// Email configuration - using ethereal email for testing (no credentials required)
+const createTransporter = async () => {
+  // Create a test account with Ethereal Email - a fake SMTP service
+  const testAccount = await nodemailer.createTestAccount();
+  
+  // Create a transporter using the test account's credentials
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass
+    }
+  });
+  
+  return { transporter, previewUrl: (info) => nodemailer.getTestMessageUrl(info) };
+};
 
 // Create a new user
 export const createUser = async (req, res) => {
   const { email, firstname, lastname, password } = req.body;
   const { role } = req.query;
 
-  // Hash the password using bcrypt
+  // Hash the password using SHA-256
   const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
 
   try {
     const user = await User.create({
-      password: hashedPassword, // Use a hashed password in production
+      password: hashedPassword,
       role: role || 'User',
       firstname,
       lastname,
-      email
+      email,
+      status: 'Active'
     });
+
+    // Notify admins about new user registration
+    try {
+      // Get all active admins
+      const admins = await User.findAll({
+        where: { role: 'Admin', status: 'Active' }
+      });
+
+      // Send notification email to all admins if any exist
+      if (admins.length > 0) {
+        const adminEmails = admins.map(admin => admin.email);
+        
+        // Create email transporter on demand
+        const { transporter, previewUrl } = await createTransporter();
+        
+        const mailOptions = {
+          from: '"T-Tech Notificaciones" <notifications@t-tech.cl>',
+          to: adminEmails.join(','),
+          subject: 'Nuevo usuario registrado - T-Tech',
+          html: `
+            <h2>Nuevo usuario registrado</h2>
+            <p>Un nuevo usuario se ha registrado en la plataforma:</p>
+            <p><strong>Nombre:</strong> ${firstname} ${lastname}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Rol:</strong> ${role || 'User'}</p>
+            <p>Gracias,<br>Equipo T-Tech</p>
+          `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Admin notification email sent. Preview URL: %s', previewUrl(info));
+      }
+    } catch (emailError) {
+      console.error('Error sending notification email:', emailError);
+      // Don't break the registration process if email fails
+    }
 
     console.log('New user created:', user);
     return res.status(200).json({ user });
@@ -64,8 +111,11 @@ export const createAdminUser = async (req, res) => {
     if (admins.length > 0) {
       const adminEmails = admins.map(admin => admin.email);
       
+      // Create email transporter on demand
+      const { transporter, previewUrl } = await createTransporter();
+      
       const mailOptions = {
-        from: process.env.EMAIL_USER || 'notification@t-tech.cl',
+        from: '"T-Tech Notificaciones" <notifications@t-tech.cl>',
         to: adminEmails.join(','),
         subject: 'Nueva solicitud de administrador - T-Tech',
         html: `
@@ -78,13 +128,8 @@ export const createAdminUser = async (req, res) => {
         `
       };
 
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error('Error sending email:', error);
-        } else {
-          console.log('Email sent:', info.response);
-        }
-      });
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent. Preview URL: %s', previewUrl(info));
     }
 
     return res.status(200).json({ 
@@ -115,13 +160,16 @@ export const approveAdminUser = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Create email transporter on demand
+    const { transporter, previewUrl } = await createTransporter();
+
     if (approve) {
       user.status = 'Active';
       await user.save();
       
       // Send approval email to the user
       const mailOptions = {
-        from: process.env.EMAIL_USER || 'notification@t-tech.cl',
+        from: '"T-Tech Notificaciones" <notifications@t-tech.cl>',
         to: user.email,
         subject: 'Su cuenta de administrador ha sido aprobada - T-Tech',
         html: `
@@ -132,7 +180,8 @@ export const approveAdminUser = async (req, res) => {
         `
       };
 
-      transporter.sendMail(mailOptions);
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Approval email sent. Preview URL: %s', previewUrl(info));
       
       return res.status(200).json({ message: 'Usuario administrador aprobado', user });
     } else {
@@ -141,21 +190,22 @@ export const approveAdminUser = async (req, res) => {
       
       // Send rejection email
       const mailOptions = {
-        from: process.env.EMAIL_USER || 'notification@t-tech.cl',
+        from: '"T-Tech Notificaciones" <notifications@t-tech.cl>',
         to: user.email,
         subject: 'Su solicitud de administrador ha sido rechazada - T-Tech',
         html: `
           <h2>Solicitud de administrador rechazada</h2>
           <p>Hola ${user.firstname},</p>
           <p>Lamentamos informarle que su solicitud para ser administrador ha sido rechazada.</p>
-          <p>Si cree que esto es un error, póngase en contacto con el equipo de soporte.</p>
+          <p>Si cree que esto es un error, por favor póngase en contacto con nuestro equipo de soporte.</p>
           <p>Gracias,<br>Equipo T-Tech</p>
         `
       };
 
-      transporter.sendMail(mailOptions);
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Rejection email sent. Preview URL: %s', previewUrl(info));
       
-      return res.status(200).json({ message: 'Usuario administrador rechazado' });
+      return res.status(200).json({ message: 'Usuario administrador rechazado y eliminado' });
     }
   } catch (error) {
     console.error('Error approving/rejecting admin:', error);

@@ -63,7 +63,8 @@ const other = {
       title: 'Roles y usuarios',
       type: 'item',
       url: '/roles/usuarios',
-      icon: icons.TeamOutlined
+      icon: icons.TeamOutlined,
+      renderFor: ['Admin']
     }
   ]
 };
