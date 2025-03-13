@@ -1,6 +1,12 @@
 export const ACCOUNT_ENDPOINTS = {
   LOGIN: '/api/account/login',
-  REGISTER: '/api/account/register'
+  REGISTER: '/api/account/register',
+  REGISTER_ADMIN: '/api/account/register-admin',
+  GET_USERS: '/api/account/get-users',
+  PENDING_ADMINS: '/api/account/pending-admins',
+  UPDATE_USER_ROLE: '/api/account/update-role',
+  APPROVE_ADMIN: '/api/account/approve-admin',
+  DELETE_USER: '/api/account/delete-user'
 };
 
 export const REQUESTS_ENDPOINTS = {

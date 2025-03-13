@@ -18,7 +18,12 @@ import {
   SearchOutlined,
   FileSearchOutlined,
   DatabaseOutlined,
-  UsergroupAddOutlined
+  UsergroupAddOutlined,
+  UserSwitchOutlined,
+  SettingOutlined,
+  TeamOutlined,
+  LockOutlined,
+  SafetyCertificateOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -38,22 +43,27 @@ const icons = {
   SearchOutlined,
   FileSearchOutlined,
   DatabaseOutlined,
-  UsergroupAddOutlined
+  UsergroupAddOutlined,
+  UserSwitchOutlined,
+  SettingOutlined,
+  TeamOutlined,
+  LockOutlined,
+  SafetyCertificateOutlined
 };
 
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
 
 const other = {
   id: 'users',
-  title: <FormattedMessage id="Gestión de Usuarios" />,
+  title: <FormattedMessage id="Administración" />,
   type: 'group',
   children: [
     {
       id: 'user-roles',
-      title: 'Manejo de Roles',
+      title: 'Roles y usuarios',
       type: 'item',
       url: '/roles/usuarios',
-      icon: icons.UsergroupAddOutlined
+      icon: icons.TeamOutlined
     }
   ]
 };

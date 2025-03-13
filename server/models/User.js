@@ -25,6 +25,10 @@ const User = sequelize.define(
       type: DataTypes.ENUM('Admin', 'Manager', 'User'),
       defaultValue: 'User'
     },
+    status: {
+      type: DataTypes.ENUM('Active', 'Pending', 'Suspended'),
+      defaultValue: 'Active'
+    },
     email: {
       type: DataTypes.STRING,
       unique: true
