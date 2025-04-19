@@ -15,18 +15,30 @@ const RoleGuard = ({ children, allowedRoles }) => {
   const location = useLocation();
 
   useEffect(() => {
-    if (user && !allowedRoles.includes(user.role)) {
-      navigate('/forbidden', {
-        state: {
-          from: location.pathname
-        },
-        replace: true
-      });
+    if (user) {
+      // If the user has type "user", redirect to buscar-documento instead of forbidden
+      if (user.type === 'user') {
+        navigate('/mantenimiento/buscar-documento', {
+          state: {
+            from: location.pathname
+          },
+          replace: true
+        });
+      } 
+      // For other users, check role as usual
+      else if (!allowedRoles.includes(user.role)) {
+        navigate('/forbidden', {
+          state: {
+            from: location.pathname
+          },
+          replace: true
+        });
+      }
     }
   }, [user, allowedRoles, navigate, location]);
 
   // If user role is allowed, render children
-  if (user && allowedRoles.includes(user.role)) {
+  if (user && allowedRoles.includes(user.role) && user.type !== 'user') {
     return children;
   }
 

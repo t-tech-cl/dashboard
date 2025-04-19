@@ -18,8 +18,8 @@ const MaintenanceDB = () => {
   const [templateLoading, setTemplateLoading] = useState(false);
   const { user } = useAuth();
   
-  // Check if user has edit permissions (Admin or Manager)
-  const hasEditPermission = user && (user.role === 'Admin' || user.role === 'Manager');
+  // Check if user has edit permissions (Admin or Manager role, or not type "user")
+  const hasEditPermission = user && ((user.role === 'Admin' || user.role === 'Manager') && user.type !== 'user');
 
   useEffect(() => {
     (async () => {
@@ -260,7 +260,7 @@ const MaintenanceDB = () => {
                 Modo solo lectura
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                Como usuario con rol {user?.role}, solo tienes acceso de lectura a esta información.
+                Como usuario con tipo {user?.type}, solo tienes acceso de lectura a esta información.
               </Typography>
             </Grid>
           </Grid>
@@ -284,18 +284,26 @@ const MaintenanceDB = () => {
         </Grid>
         <Grid item>
           <Grid container spacing={2}>
-            {hasEditPermission && tabIndex === 0 && (
+            {/* Show template export button but disabled for regular users */}
+            {tabIndex === 0 && (
               <Grid item>
-                <Button variant="contained" color="primary" onClick={exportWithTemplate} disabled={templateLoading}>
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  onClick={exportWithTemplate} 
+                  disabled={templateLoading || !hasEditPermission}
+                >
                   {templateLoading ? 'Exportando...' : 'Exportar con Plantilla'}
                 </Button>
               </Grid>
             )}
+            {/* Show CSV export button but disabled for regular users */}
             <Grid item>
               <Button
                 variant="contained"
                 color="info"
                 onClick={() => exportCSV(tabIndex === 0 ? data : externalReports, tabIndex === 0 ? 'solicitud_mantencion' : 'reportes_externos')}
+                disabled={!hasEditPermission}
               >
                 Exportar CSV
               </Button>

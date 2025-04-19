@@ -18,7 +18,6 @@ import { ThemeMode } from 'config';
 import useAuth from 'hooks/useAuth';
 
 // assets
-import avatar from 'assets/images/users/avatar.png';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 
 // tab panel wrapper
@@ -84,6 +83,26 @@ const Profile = () => {
 
   const iconBackColorOpen = theme.palette.mode === ThemeMode.DARK ? 'grey.200' : 'grey.300';
 
+  // Function to determine the avatar background color based on user role
+  const getAvatarBgColor = () => {
+    if (!user) return theme.palette.primary.main;
+    
+    switch (user.role) {
+      case 'Admin':
+        return theme.palette.error.main;
+      case 'Manager':
+        return theme.palette.warning.main;
+      default:
+        return theme.palette.primary.main;
+    }
+  };
+
+  // Function to get user initials
+  const getUserInitials = () => {
+    if (!user || !user.firstname || !user.lastname) return '?';
+    return `${user.firstname[0]}${user.lastname[0]}`;
+  };
+
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
       <ButtonBase
@@ -104,7 +123,16 @@ const Profile = () => {
         onClick={handleToggle}
       >
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
-          <Avatar alt="profile user" src={avatar} size="xs" />
+          <Avatar 
+            alt="profile user" 
+            size="xs"
+            sx={{ 
+              bgcolor: getAvatarBgColor(),
+              color: '#fff'
+            }}
+          >
+            {getUserInitials()}
+          </Avatar>
           <Typography variant="subtitle1">{`${user?.firstname} ${user?.lastname}`}</Typography>
         </Stack>
       </ButtonBase>
@@ -145,7 +173,17 @@ const Profile = () => {
                     <Grid container justifyContent="space-between" alignItems="center">
                       <Grid item>
                         <Stack direction="row" spacing={1.25} alignItems="center">
-                          <Avatar alt="profile user" src={avatar} sx={{ width: 32, height: 32 }} />
+                          <Avatar 
+                            alt="profile user" 
+                            sx={{ 
+                              width: 32, 
+                              height: 32,
+                              bgcolor: getAvatarBgColor(),
+                              color: '#fff'
+                            }}
+                          >
+                            {getUserInitials()}
+                          </Avatar>
                           <Stack>
                             <Typography variant="h6">{`${user?.firstname} ${user?.lastname}`}</Typography>
                             <Typography variant="body2" color="textSecondary">

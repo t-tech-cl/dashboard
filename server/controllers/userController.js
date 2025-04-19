@@ -3,23 +3,28 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import nodemailer from 'nodemailer';
 
-// Email configuration - using ethereal email for testing (no credentials required)
+// Email configuration using Gmail
+// SECURITY NOTE: For production, store credentials in environment variables
+// and consider using OAuth2 or App Passwords instead of direct password
+// You may need to enable "Less secure app access" in your Google account
+// or generate an App Password if using 2-factor authentication
 const createTransporter = async () => {
   // Create a test account with Ethereal Email - a fake SMTP service
   const testAccount = await nodemailer.createTestAccount();
   
   // Create a transporter using the test account's credentials
   const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    service: 'gmail',
     auth: {
       user: testAccount.user,
       pass: testAccount.pass
     }
   });
   
-  return { transporter, previewUrl: (info) => nodemailer.getTestMessageUrl(info) };
+  return { 
+    transporter, 
+    previewUrl: () => null // No preview URL for real emails
+  };
 };
 
 // Create a new user
@@ -31,6 +36,15 @@ export const createUser = async (req, res) => {
   const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
 
   try {
+    // Check if user with this email already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ 
+        error: 'Ya existe un usuario con este correo electrónico', 
+        type: 'email_exists' 
+      });
+    }
+
     const user = await User.create({
       password: hashedPassword,
       role: role || 'User',
@@ -52,24 +66,55 @@ export const createUser = async (req, res) => {
         const adminEmails = admins.map(admin => admin.email);
         
         // Create email transporter on demand
-        const { transporter, previewUrl } = await createTransporter();
+        const { transporter } = await createTransporter();
         
         const mailOptions = {
           from: '"T-Tech Notificaciones" <notifications@t-tech.cl>',
           to: adminEmails.join(','),
           subject: 'Nuevo usuario registrado - T-Tech',
           html: `
-            <h2>Nuevo usuario registrado</h2>
-            <p>Un nuevo usuario se ha registrado en la plataforma:</p>
-            <p><strong>Nombre:</strong> ${firstname} ${lastname}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Rol:</strong> ${role || 'User'}</p>
-            <p>Gracias,<br>Equipo T-Tech</p>
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+                .header { background-color: #2196F3; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+                .content { padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; }
+                .user-info { background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                .button { display: inline-block; background-color: #4CAF50; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; }
+                .footer { margin-top: 20px; font-size: 12px; color: #777; }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <h2>Nuevo usuario registrado</h2>
+              </div>
+              <div class="content">
+                <p>Un nuevo usuario se ha registrado en la plataforma T-Tech:</p>
+                
+                <div class="user-info">
+                  <p><strong>Nombre:</strong> ${firstname} ${lastname}</p>
+                  <p><strong>Email:</strong> ${email}</p>
+                  <p><strong>Rol:</strong> ${role || 'User'}</p>
+                  <p><strong>Fecha de registro:</strong> ${new Date().toLocaleString()}</p>
+                </div>
+                
+                <p>Puede ver todos los usuarios en el panel de administración:</p>
+                
+                <a href="${process.env.APP_URL || 'https://app.t-tech.cl'}/roles/usuarios" class="button">Ir al panel de usuarios</a>
+                
+                <div class="footer">
+                  <p>Este es un mensaje automático, por favor no responda a este correo.</p>
+                  <p>Gracias,<br>Equipo T-Tech</p>
+                </div>
+              </div>
+            </body>
+            </html>
           `
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log('Admin notification email sent. Preview URL: %s', previewUrl(info));
+        console.log('Admin notification email sent to:', adminEmails.join(','));
       }
     } catch (emailError) {
       console.error('Error sending notification email:', emailError);
@@ -77,7 +122,10 @@ export const createUser = async (req, res) => {
     }
 
     console.log('New user created:', user);
-    return res.status(200).json({ user });
+    return res.status(200).json({ 
+      user,
+      message: 'Su solicitud ha sido enviada. Debe ser aprobada por un administrador existente.'
+    });
   } catch (error) {
     console.error('Error creating user:', error);
     return res.status(500).json({ error: error.message });
@@ -119,17 +167,47 @@ export const createAdminUser = async (req, res) => {
         to: adminEmails.join(','),
         subject: 'Nueva solicitud de administrador - T-Tech',
         html: `
-          <h2>Nueva solicitud de registro como Administrador</h2>
-          <p>Un nuevo usuario ha solicitado acceso como administrador:</p>
-          <p><strong>Nombre:</strong> ${firstname} ${lastname}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p>Inicie sesión en el panel de administración para aprobar o rechazar esta solicitud.</p>
-          <p>Gracias,<br>Equipo T-Tech</p>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+              .header { background-color: #f44336; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+              .content { padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; }
+              .user-info { background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 15px 0; }
+              .button { display: inline-block; background-color: #4CAF50; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; }
+              .footer { margin-top: 20px; font-size: 12px; color: #777; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h2>Nueva solicitud de registro como Administrador</h2>
+            </div>
+            <div class="content">
+              <p>Un nuevo usuario ha solicitado acceso como administrador en la plataforma T-Tech.</p>
+              
+              <div class="user-info">
+                <p><strong>Nombre:</strong> ${firstname} ${lastname}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Fecha de solicitud:</strong> ${new Date().toLocaleString()}</p>
+              </div>
+              
+              <p>Para aprobar o rechazar esta solicitud, inicie sesión en el panel de administración y vaya a la sección de <strong>Administración de roles y usuarios</strong>.</p>
+              
+              <a href="${process.env.APP_URL || 'https://app.t-tech.cl'}/roles/usuarios" class="button">Ir al panel de administración</a>
+              
+              <div class="footer">
+                <p>Este es un mensaje automático, por favor no responda a este correo.</p>
+                <p>Gracias,<br>Equipo T-Tech</p>
+              </div>
+            </div>
+          </body>
+          </html>
         `
       };
 
       const info = await transporter.sendMail(mailOptions);
-      console.log('Email sent. Preview URL: %s', previewUrl(info));
+      console.log('Admin request notification email sent to:', adminEmails.join(','));
     }
 
     return res.status(200).json({ 
@@ -173,15 +251,39 @@ export const approveAdminUser = async (req, res) => {
         to: user.email,
         subject: 'Su cuenta de administrador ha sido aprobada - T-Tech',
         html: `
-          <h2>Solicitud de administrador aprobada</h2>
-          <p>Hola ${user.firstname},</p>
-          <p>Su solicitud para ser administrador ha sido aprobada. Ahora puede iniciar sesión con todos los privilegios de administrador.</p>
-          <p>Gracias,<br>Equipo T-Tech</p>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+              .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+              .content { padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; }
+              .button { display: inline-block; background-color: #f44336; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; }
+              .footer { margin-top: 20px; font-size: 12px; color: #777; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h2>Solicitud de administrador aprobada</h2>
+            </div>
+            <div class="content">
+              <p>Hola ${user.firstname},</p>
+              <p>¡Felicitaciones! Su solicitud para ser administrador ha sido aprobada. Ahora puede iniciar sesión con todos los privilegios de administrador.</p>
+              
+              <a href="${process.env.APP_URL || 'https://app.t-tech.cl'}/auth/login" class="button">Iniciar sesión</a>
+              
+              <div class="footer">
+                <p>Este es un mensaje automático, por favor no responda a este correo.</p>
+                <p>Gracias,<br>Equipo T-Tech</p>
+              </div>
+            </div>
+          </body>
+          </html>
         `
       };
 
       const info = await transporter.sendMail(mailOptions);
-      console.log('Approval email sent. Preview URL: %s', previewUrl(info));
+      console.log('Approval email sent to:', user.email);
       
       return res.status(200).json({ message: 'Usuario administrador aprobado', user });
     } else {
@@ -194,16 +296,40 @@ export const approveAdminUser = async (req, res) => {
         to: user.email,
         subject: 'Su solicitud de administrador ha sido rechazada - T-Tech',
         html: `
-          <h2>Solicitud de administrador rechazada</h2>
-          <p>Hola ${user.firstname},</p>
-          <p>Lamentamos informarle que su solicitud para ser administrador ha sido rechazada.</p>
-          <p>Si cree que esto es un error, por favor póngase en contacto con nuestro equipo de soporte.</p>
-          <p>Gracias,<br>Equipo T-Tech</p>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+              .header { background-color: #f44336; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+              .content { padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; }
+              .button { display: inline-block; background-color: #2196F3; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; }
+              .footer { margin-top: 20px; font-size: 12px; color: #777; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h2>Solicitud de administrador rechazada</h2>
+            </div>
+            <div class="content">
+              <p>Hola ${user.firstname},</p>
+              <p>Lamentamos informarle que su solicitud para ser administrador ha sido rechazada.</p>
+              <p>Si cree que esto es un error, por favor póngase en contacto con nuestro equipo de soporte o puede intentar registrarse nuevamente como usuario regular.</p>
+              
+              <a href="${process.env.APP_URL || 'https://app.t-tech.cl'}/auth/register" class="button">Registrarse como usuario regular</a>
+              
+              <div class="footer">
+                <p>Este es un mensaje automático, por favor no responda a este correo.</p>
+                <p>Gracias,<br>Equipo T-Tech</p>
+              </div>
+            </div>
+          </body>
+          </html>
         `
       };
 
       const info = await transporter.sendMail(mailOptions);
-      console.log('Rejection email sent. Preview URL: %s', previewUrl(info));
+      console.log('Rejection email sent to:', user.email);
       
       return res.status(200).json({ message: 'Usuario administrador rechazado y eliminado' });
     }
@@ -311,16 +437,25 @@ export const loginUser = async (req, res) => {
 
     // If user not found
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ 
+        error: 'La cuenta no existe. Por favor regístrese primero.', 
+        type: 'account_not_found' 
+      });
     }
 
     if (user.password !== password) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ 
+        error: 'Contraseña incorrecta', 
+        type: 'invalid_password' 
+      });
     }
 
     // Check if admin is pending approval
     if (user.role === 'Admin' && user.status === 'Pending') {
-      return res.status(401).json({ error: 'Your administrator account is pending approval' });
+      return res.status(401).json({ 
+        error: 'Su cuenta de administrador está pendiente de aprobación', 
+        type: 'pending_approval' 
+      });
     }
 
     // Generate JWT token (expires in 1 hour)

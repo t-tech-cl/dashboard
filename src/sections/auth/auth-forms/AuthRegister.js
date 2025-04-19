@@ -100,7 +100,7 @@ const AuthRegister = () => {
             dispatch(
               openSnackbar({
                 open: true,
-                message: 'Su solicitud de administrador ha sido enviada y está pendiente de aprobación.',
+                message: 'Su solicitud de administrador ha sido enviada y está pendiente de aprobación. Los administradores han sido notificados por correo electrónico.',
                 variant: 'alert',
                 alert: {
                   color: 'success',
@@ -116,8 +116,8 @@ const AuthRegister = () => {
             );
 
             setTimeout(() => {
-              navigate('/login', { replace: true });
-            }, 2000);
+              navigate('/auth/login', { replace: true });
+            }, 3000);
           } else {
             // Regular user registration
             await register(values.email, values.password, values.firstname, values.lastname, location.search);
@@ -315,7 +315,8 @@ const AuthRegister = () => {
                   onClose={() => setAdminInfoOpen(false)}
                 >
                   Al solicitar privilegios de administrador, su cuenta quedará pendiente de aprobación por parte de los administradores existentes.
-                  Recibirá una notificación por correo electrónico cuando su solicitud sea aprobada o rechazada.
+                  <strong> Se enviará una notificación por correo electrónico a todos los administradores</strong> para que revisen su solicitud.
+                  Usted también recibirá una notificación por correo cuando su solicitud sea aprobada o rechazada.
                 </Alert>
               </Collapse>
             </Grid>
@@ -336,7 +337,7 @@ const AuthRegister = () => {
                   variant="contained"
                   color="primary"
                 >
-                  {isAdmin ? 'Solicitar registro como administrador' : 'Crear cuenta'}
+                  {isAdmin ? 'Solicitar registro como administrador' : 'Solicitar registro'}
                 </Button>
               </AnimateButton>
             </Grid>
