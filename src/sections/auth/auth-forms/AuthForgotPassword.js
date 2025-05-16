@@ -12,16 +12,12 @@ import useAuth from 'hooks/useAuth';
 import useScriptRef from 'hooks/useScriptRef';
 import AnimateButton from 'components/@extended/AnimateButton';
 
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-
-// ============================|| FIREBASE - FORGOT PASSWORD ||============================ //
+// ============================|| FORGOT PASSWORD ||============================ //
 
 const AuthForgotPassword = () => {
   const scriptedRef = useScriptRef();
   const navigate = useNavigate();
-
-  const { isLoggedIn, resetPassword } = useAuth();
+  const { requestPasswordReset } = useAuth();
 
   return (
     <>
@@ -31,40 +27,19 @@ const AuthForgotPassword = () => {
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          email: Yup.string().email('Must be a valid email').max(255).required('Email is required')
+          email: Yup.string().email('Debe ser un correo electrónico válido').max(255).required('El correo electrónico es requerido')
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
-            await resetPassword(values.email).then(
-              () => {
-                setStatus({ success: true });
-                setSubmitting(false);
-                dispatch(
-                  openSnackbar({
-                    open: true,
-                    message: 'Check mail for reset password link',
-                    variant: 'alert',
-                    alert: {
-                      color: 'success'
-                    },
-                    close: false
-                  })
-                );
-                setTimeout(() => {
-                  navigate(isLoggedIn ? '/auth/check-mail' : '/check-mail', { replace: true });
-                }, 1500);
+            await requestPasswordReset(values.email);
+            setStatus({ success: true });
+            setSubmitting(false);
 
-                // WARNING: do not set any formik state here as formik might be already destroyed here. You may get following error by doing so.
-                // Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application.
-                // To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
-                // github issue: https://github.com/formium/formik/issues/2430
-              },
-              (err) => {
-                setStatus({ success: false });
-                setErrors({ submit: err.message });
-                setSubmitting(false);
-              }
-            );
+            // Navigate to verification page with email
+            navigate('/verify-reset-code', {
+              state: { email: values.email },
+              replace: true
+            });
           } catch (err) {
             console.error(err);
             if (scriptedRef.current) {
@@ -80,7 +55,7 @@ const AuthForgotPassword = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="email-forgot">Email Address</InputLabel>
+                  <InputLabel htmlFor="email-forgot">Correo Electrónico</InputLabel>
                   <OutlinedInput
                     fullWidth
                     error={Boolean(touched.email && errors.email)}
@@ -90,7 +65,7 @@ const AuthForgotPassword = () => {
                     name="email"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    placeholder="Enter email address"
+                    placeholder="Ingresa tu correo electrónico"
                     inputProps={{}}
                   />
                   {touched.email && errors.email && (
@@ -106,12 +81,12 @@ const AuthForgotPassword = () => {
                 </Grid>
               )}
               <Grid item xs={12} sx={{ mb: -2 }}>
-                <Typography variant="caption">Do not forgot to check SPAM box.</Typography>
+                <Typography variant="caption">*No olvides revisar la carpeta de SPAM.</Typography>
               </Grid>
               <Grid item xs={12}>
                 <AnimateButton>
                   <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                    Send Password Reset Email
+                    Solicitar código
                   </Button>
                 </AnimateButton>
               </Grid>

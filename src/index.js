@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 
 // third-party
 import { Provider as ReduxProvider } from 'react-redux';
@@ -20,6 +19,7 @@ import App from './App';
 import { store, persister } from 'store';
 import { ConfigProvider } from 'contexts/ConfigContext';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -29,7 +29,7 @@ root.render(
   <ReduxProvider store={store}>
     <PersistGate loading={null} persistor={persister}>
       <ConfigProvider>
-        <BrowserRouter basename='/dashboard'>
+        <BrowserRouter basename="/dashboard">
           <App />
         </BrowserRouter>
       </ConfigProvider>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ACCOUNT_ENDPOINTS } from 'const/urls';
 import axiosServices from 'utils/axios';
-import { 
+import {
   Box,
   Typography,
   FormControl,
@@ -29,10 +29,10 @@ import {
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainCard from 'components/MainCard';
-import { 
-  TeamOutlined, 
-  UserSwitchOutlined, 
-  LockOutlined, 
+import {
+  TeamOutlined,
+  UserSwitchOutlined,
+  LockOutlined,
   SafetyCertificateOutlined,
   UserAddOutlined,
   DeleteOutlined,
@@ -47,6 +47,7 @@ import useAuth from 'hooks/useAuth';
 const UserRoles = () => {
   const [users, setUsers] = useState([]);
   const [pendingAdmins, setPendingAdmins] = useState([]);
+  const [pendingUsers, setPendingUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -64,7 +65,7 @@ const UserRoles = () => {
     password: '',
     role: 'User'
   });
-  
+
   const { user } = useAuth();
 
   // Check if user is admin and redirect if not
@@ -82,15 +83,19 @@ const UserRoles = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch active users
         const usersResponse = await axiosServices.get(ACCOUNT_ENDPOINTS.GET_USERS);
         setUsers(usersResponse.data);
-        
+
         // Fetch pending admin requests
         if (user && user.role === 'Admin') {
           const pendingResponse = await axiosServices.get(ACCOUNT_ENDPOINTS.PENDING_ADMINS);
           setPendingAdmins(pendingResponse.data);
+
+          // Fetch pending non-admin users
+          const pendingUsersResponse = await axiosServices.get(ACCOUNT_ENDPOINTS.PENDING_USERS);
+          setPendingUsers(pendingUsersResponse.data);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -107,9 +112,7 @@ const UserRoles = () => {
     fetchData();
   }, [user]);
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
+  const handleTabChange = (tab) => setTabValue(tab);
 
   const handleRoleChange = async (userId, newRole) => {
     try {
@@ -117,14 +120,10 @@ const UserRoles = () => {
         userID: userId,
         role: newRole
       });
-      
+
       // Update local state
-      setUsers(prevUsers => 
-        prevUsers.map(user => 
-          user.userID === userId ? { ...user, role: newRole } : user
-        )
-      );
-      
+      setUsers((prevUsers) => prevUsers.map((user) => (user.userID === userId ? { ...user, role: newRole } : user)));
+
       setSnackbar({
         open: true,
         message: `Rol de usuario actualizado correctamente a ${newRole}`,
@@ -151,12 +150,12 @@ const UserRoles = () => {
         });
         return;
       }
-      
+
       const response = await axiosServices.post(ACCOUNT_ENDPOINTS.REGISTER, newUser);
-      
+
       // Add the new user to the list
-      setUsers(prevUsers => [...prevUsers, response.data.user]);
-      
+      setUsers((prevUsers) => [...prevUsers, response.data.user]);
+
       // Close dialog and reset form
       setOpenAddDialog(false);
       setNewUser({
@@ -166,7 +165,7 @@ const UserRoles = () => {
         password: '',
         role: 'User'
       });
-      
+
       setSnackbar({
         open: true,
         message: 'Usuario creado correctamente',
@@ -185,15 +184,15 @@ const UserRoles = () => {
   const handleDeleteUser = async (userId) => {
     try {
       await axiosServices.delete(`${ACCOUNT_ENDPOINTS.DELETE_USER}/${userId}`);
-      
+
       // Update local state by removing the deleted user
-      setUsers(prevUsers => prevUsers.filter(user => user.userID !== userId));
-      
+      setUsers((prevUsers) => prevUsers.filter((user) => user.userID !== userId));
+
       // Close modal if the deleted user was selected
       if (selectedUser && selectedUser.userID === userId) {
         setSelectedUser(null);
       }
-      
+
       setSnackbar({
         open: true,
         message: 'Usuario eliminado correctamente',
@@ -215,19 +214,19 @@ const UserRoles = () => {
         userID: userId,
         approve
       });
-      
+
       // Update local state by removing the approved/rejected admin
-      setPendingAdmins(prevAdmins => prevAdmins.filter(admin => admin.userID !== userId));
-      
+      setPendingAdmins((prevAdmins) => prevAdmins.filter((admin) => admin.userID !== userId));
+
       // If approved, add to active users list
       if (approve) {
-        const approvedAdmin = pendingAdmins.find(admin => admin.userID === userId);
+        const approvedAdmin = pendingAdmins.find((admin) => admin.userID === userId);
         if (approvedAdmin) {
           approvedAdmin.status = 'Active';
-          setUsers(prevUsers => [...prevUsers, approvedAdmin]);
+          setUsers((prevUsers) => [...prevUsers, approvedAdmin]);
         }
       }
-      
+
       setSnackbar({
         open: true,
         message: approve ? 'Administrador aprobado correctamente' : 'Solicitud rechazada',
@@ -243,6 +242,40 @@ const UserRoles = () => {
     }
   };
 
+  const handleApproveUser = async (userId, approve) => {
+    try {
+      await axiosServices.post(ACCOUNT_ENDPOINTS.APPROVE_USER, {
+        userID: userId,
+        approve
+      });
+
+      // Update local state by removing the approved/rejected user
+      setPendingUsers((prevUsers) => prevUsers.filter((user) => user.userID !== userId));
+
+      // If approved, add to active users list
+      if (approve) {
+        const approvedUser = pendingUsers.find((user) => user.userID === userId);
+        if (approvedUser) {
+          approvedUser.status = 'Active';
+          setUsers((prevUsers) => [...prevUsers, approvedUser]);
+        }
+      }
+
+      setSnackbar({
+        open: true,
+        message: approve ? 'Usuario aprobado correctamente' : 'Solicitud rechazada',
+        severity: approve ? 'success' : 'info'
+      });
+    } catch (error) {
+      console.error('Error approving/rejecting user:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.error || 'Error al procesar la solicitud',
+        severity: 'error'
+      });
+    }
+  };
+
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -250,22 +283,14 @@ const UserRoles = () => {
   const getRoleChip = (role, status) => {
     let color;
     let icon;
-    
+
     if (status === 'Pending') {
-      return (
-        <Chip 
-          icon={<ExclamationCircleOutlined />}
-          label="Pendiente" 
-          color="warning" 
-          size="small"
-          sx={{ fontWeight: 'bold' }}
-        />
-      );
+      return <Chip icon={<ExclamationCircleOutlined />} label="Pendiente" color="warning" size="small" sx={{ fontWeight: 'bold' }} />;
     }
-    
+
     switch (role) {
       case 'Admin':
-        color = 'error';
+        color = 'info';
         icon = <SafetyCertificateOutlined />;
         break;
       case 'Manager':
@@ -276,25 +301,19 @@ const UserRoles = () => {
         color = 'primary';
         icon = <TeamOutlined />;
     }
-    
-    return (
-      <Chip 
-        icon={icon}
-        label={role} 
-        color={color} 
-        size="small"
-        sx={{ fontWeight: 'bold' }}
-      />
-    );
+
+    return <Chip icon={icon} label={role} color={color} size="small" sx={{ fontWeight: 'bold' }} />;
   };
 
-  const filteredUsers = searchTerm 
-    ? users.filter(user => 
-        user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        user.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = searchTerm
+    ? users.filter(
+        (user) =>
+          (user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+          user.status === 'Active'
       )
-    : users;
+    : users.filter((user) => user.status === 'Active');
 
   // Card variants for framer-motion
   const cardVariants = {
@@ -305,58 +324,89 @@ const UserRoles = () => {
       transition: {
         delay: i * 0.1,
         duration: 0.5,
-        ease: "easeOut"
+        ease: 'easeOut'
       }
     }),
-    hover: { 
+    hover: {
       scale: 1.05,
-      boxShadow: "0px 10px 20px rgba(0,0,0,0.1)",
+      boxShadow: '0px 10px 20px rgba(0,0,0,0.1)',
       transition: { duration: 0.3 }
     }
   };
 
   return (
     <Box sx={{ padding: 2 }}>
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Typography variant="h2" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <UserSwitchOutlined style={{ marginRight: '12px', fontSize: '1.2em' }} />
           Administración de roles y usuarios
         </Typography>
       </motion.div>
 
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs value={tabValue} onChange={handleTabChange} aria-label="user management tabs">
-            <Tab 
-              label="Usuarios Activos" 
-              icon={<TeamOutlined />} 
+          <Tabs
+            value={tabValue}
+            aria-label="user management tabs"
+            sx={{
+              backgroundColor: '#1e1e1e',
+              '& .MuiTabs-indicator': {
+                display: 'none'
+              }
+            }}
+          >
+            <Tab
+              label="Usuarios Activos"
+              icon={<TeamOutlined />}
               iconPosition="start"
+              onClick={() => handleTabChange(0)}
+              sx={{
+                '&.Mui-selected': {
+                  backgroundColor: 'primary.main',
+                  color: 'white'
+                }
+              }}
             />
-            {user && user.role === 'Admin' && (
-              <Tab 
-                label={
-                  <Badge badgeContent={pendingAdmins.length} color="error" sx={{ '& .MuiBadge-badge': { right: -15 } }}>
-                    Solicitudes de Admin
-                  </Badge>
-                } 
-                icon={<MailOutlined />} 
-                iconPosition="start"
-              />
-            )}
+            <Tab
+              label={
+                <Badge badgeContent={pendingAdmins.length} color="error">
+                  Solicitudes de Admin
+                </Badge>
+              }
+              onClick={() => handleTabChange(1)}
+              icon={<MailOutlined />}
+              iconPosition="start"
+              sx={{
+                color: 'white',
+                '&.Mui-selected': {
+                  backgroundColor: 'primary.main',
+                  color: 'white'
+                }
+              }}
+            />
+            <Tab
+              label={
+                <Badge badgeContent={pendingUsers.length} color="warning">
+                  Usuarios Pendientes
+                </Badge>
+              }
+              onClick={() => handleTabChange(2)}
+              icon={<TeamOutlined />}
+              iconPosition="start"
+              sx={{
+                color: 'white',
+                '&.Mui-selected': {
+                  backgroundColor: 'primary.main',
+                  color: 'white'
+                }
+              }}
+            />
           </Tabs>
         </Box>
       </motion.div>
 
-      {tabValue === 0 && (
-        <>
+      <Box sx={{ mt: 3 }}>
+        <TabPanel value={tabValue} index={0}>
           <Grid container spacing={2} sx={{ mb: 4 }}>
             <Grid item xs={12} md={6}>
               <TextField
@@ -383,10 +433,7 @@ const UserRoles = () => {
 
           {isLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}>
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              >
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}>
                 <TeamOutlined style={{ fontSize: '3rem' }} />
               </motion.div>
             </Box>
@@ -414,50 +461,47 @@ const UserRoles = () => {
                         }}
                         onClick={() => setSelectedUser(user)}
                       >
-                        <Box 
-                          sx={{ 
-                            position: 'absolute', 
-                            top: 0, 
-                            left: 0, 
-                            right: 0, 
-                            height: '40px', 
-                            backgroundColor: user.role === 'Admin' ? 'error.light' : user.role === 'Manager' ? 'warning.light' : 'primary.light',
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '40px',
+                            backgroundColor:
+                              user.role === 'Admin' ? 'info.light' : user.role === 'Manager' ? 'warning.light' : 'primary.light',
                             zIndex: 0
-                          }} 
+                          }}
                         />
-                        
+
                         <Box sx={{ position: 'relative', zIndex: 1, pt: 2 }}>
-                          <Stack 
-                            direction="column" 
-                            spacing={2} 
-                            alignItems="center" 
-                            sx={{ mb: 2 }}
-                          >
+                          <Stack direction="column" spacing={2} alignItems="center" sx={{ mb: 2 }}>
                             <Avatar
                               sx={{
                                 width: 80,
                                 height: 80,
-                                backgroundColor: user.role === 'Admin' ? 'error.main' : user.role === 'Manager' ? 'warning.main' : 'primary.main',
+                                backgroundColor:
+                                  user.role === 'Admin' ? 'info.main' : user.role === 'Manager' ? 'warning.main' : 'primary.main',
                                 mb: 1,
                                 boxShadow: '0 4px 8px rgba(0,0,0,0.15)'
                               }}
                             >
-                              {user.firstname[0]}{user.lastname[0]}
+                              {user.firstname[0]}
+                              {user.lastname[0]}
                             </Avatar>
-                            
+
                             <Typography variant="h4" sx={{ textAlign: 'center' }}>
                               {user.firstname} {user.lastname}
                             </Typography>
-                            
+
                             <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                               {user.email}
                             </Typography>
                           </Stack>
-                          
+
                           <Divider sx={{ my: 2 }} />
-                          
+
                           <Stack direction="row" justifyContent="space-between" alignItems="center">
-                            <Typography variant="subtitle1">Rol:</Typography>
                             {getRoleChip(user.role, user.status)}
                           </Stack>
                         </Box>
@@ -468,22 +512,16 @@ const UserRoles = () => {
               </AnimatePresence>
             </Grid>
           )}
-        </>
-      )}
+        </TabPanel>
 
-      {tabValue === 1 && (
-        <>
+        <TabPanel value={tabValue} index={1}>
           <Typography variant="h4" gutterBottom>
             Solicitudes pendientes de aprobación
           </Typography>
-          
+
           {pendingAdmins.length === 0 ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 5 }}>
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
                 <MailOutlined style={{ fontSize: '4rem', opacity: 0.5 }} />
               </motion.div>
               <Typography variant="h5" sx={{ mt: 2, opacity: 0.7 }}>
@@ -495,12 +533,7 @@ const UserRoles = () => {
               <AnimatePresence>
                 {pendingAdmins.map((admin, index) => (
                   <Grid item xs={12} md={6} key={admin.userID}>
-                    <motion.div
-                      custom={index}
-                      initial="hidden"
-                      animate="visible"
-                      variants={cardVariants}
-                    >
+                    <motion.div custom={index} initial="hidden" animate="visible" variants={cardVariants}>
                       <MainCard>
                         <Stack direction="row" spacing={3} alignItems="center">
                           <Avatar
@@ -510,9 +543,10 @@ const UserRoles = () => {
                               backgroundColor: 'warning.main'
                             }}
                           >
-                            {admin.firstname[0]}{admin.lastname[0]}
+                            {admin.firstname[0]}
+                            {admin.lastname[0]}
                           </Avatar>
-                          
+
                           <Box sx={{ flexGrow: 1 }}>
                             <Typography variant="h4">
                               {admin.firstname} {admin.lastname}
@@ -520,25 +554,23 @@ const UserRoles = () => {
                             <Typography variant="body2" color="textSecondary">
                               {admin.email}
                             </Typography>
-                            <Box sx={{ mt: 1 }}>
-                              {getRoleChip(admin.role, admin.status)}
-                            </Box>
+                            <Box sx={{ mt: 1 }}>{getRoleChip(admin.role, admin.status)}</Box>
                           </Box>
-                          
+
                           <Stack direction="row" spacing={1}>
                             <Tooltip title="Aprobar">
-                              <IconButton 
-                                color="success" 
+                              <IconButton
+                                color="success"
                                 onClick={() => handleApproveAdmin(admin.userID, true)}
                                 sx={{ border: '1px solid', borderColor: 'success.main' }}
                               >
                                 <CheckOutlined />
                               </IconButton>
                             </Tooltip>
-                            
+
                             <Tooltip title="Rechazar">
-                              <IconButton 
-                                color="error" 
+                              <IconButton
+                                color="error"
                                 onClick={() => handleApproveAdmin(admin.userID, false)}
                                 sx={{ border: '1px solid', borderColor: 'error.main' }}
                               >
@@ -554,124 +586,181 @@ const UserRoles = () => {
               </AnimatePresence>
             </Grid>
           )}
-        </>
-      )}
-      
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={2}>
+          <Typography variant="h4" gutterBottom>
+            Usuarios pendientes de aprobación
+          </Typography>
+
+          {pendingUsers.length === 0 ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 5 }}>
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
+                <TeamOutlined style={{ fontSize: '4rem', opacity: 0.5 }} />
+              </motion.div>
+              <Typography variant="h5" sx={{ mt: 2, opacity: 0.7 }}>
+                No hay usuarios pendientes
+              </Typography>
+            </Box>
+          ) : (
+            <Grid container spacing={3}>
+              <AnimatePresence>
+                {pendingUsers.map((pendingUser, index) => (
+                  <Grid item xs={12} md={6} key={pendingUser.userID}>
+                    <motion.div custom={index} initial="hidden" animate="visible" variants={cardVariants}>
+                      <MainCard>
+                        <Stack direction="row" spacing={3} alignItems="center">
+                          <Avatar
+                            sx={{
+                              width: 60,
+                              height: 60,
+                              backgroundColor: 'warning.main'
+                            }}
+                          >
+                            {pendingUser.firstname[0]}
+                            {pendingUser.lastname[0]}
+                          </Avatar>
+
+                          <Box sx={{ flexGrow: 1 }}>
+                            <Typography variant="h4">
+                              {pendingUser.firstname} {pendingUser.lastname}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              {pendingUser.email}
+                            </Typography>
+                            <Box sx={{ mt: 1 }}>{getRoleChip(pendingUser.role, pendingUser.status)}</Box>
+                          </Box>
+
+                          <Stack direction="row" spacing={1}>
+                            <Tooltip title="Aprobar">
+                              <IconButton
+                                color="success"
+                                onClick={() => handleApproveUser(pendingUser.userID, true)}
+                                sx={{ border: '1px solid', borderColor: 'success.main' }}
+                              >
+                                <CheckOutlined />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title="Rechazar">
+                              <IconButton
+                                color="error"
+                                onClick={() => handleApproveUser(pendingUser.userID, false)}
+                                sx={{ border: '1px solid', borderColor: 'error.main' }}
+                              >
+                                <CloseOutlined />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
+                        </Stack>
+                      </MainCard>
+                    </motion.div>
+                  </Grid>
+                ))}
+              </AnimatePresence>
+            </Grid>
+          )}
+        </TabPanel>
+      </Box>
+
       {/* Modal for user role edit */}
-      <AnimatePresence>
+      <Dialog
+        open={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        maxWidth="xs"
+        fullWidth
+        BackdropProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            backdropFilter: 'blur(8px)'
+          }
+        }}
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            overflow: 'hidden'
+          }
+        }}
+      >
         {selectedUser && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'black',
-                zIndex: 1000
-              }}
-              onClick={() => setSelectedUser(null)}
-            />
-            
-            <motion.div
-              layoutId={`user-${selectedUser.userID}`}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-                      style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 1001,
-                width: '400px',
-                maxWidth: '90vw',
-                maxHeight: '90vh',
-                overflowY: 'auto'
-              }}
-            >
-              <MainCard>
-                <Stack spacing={3}>
-                  <Typography variant="h3">Editar usuario</Typography>
-                  
-                  <Stack direction="column" spacing={2} alignItems="center">
-                    <Avatar
-                      sx={{
-                        width: 100,
-                        height: 100,
-                        backgroundColor: selectedUser.role === 'Admin' ? 'error.main' : selectedUser.role === 'Manager' ? 'warning.main' : 'primary.main',
-                        mb: 1,
-                        fontSize: '2rem'
-                      }}
-                    >
-                      {selectedUser.firstname[0]}{selectedUser.lastname[0]}
-                    </Avatar>
-                    
-                    <Typography variant="h4">
-                      {selectedUser.firstname} {selectedUser.lastname}
-                    </Typography>
-                    
-                    <Typography variant="body1" color="textSecondary">
-                      {selectedUser.email}
-                    </Typography>
-                  </Stack>
-                  
-                  <FormControl fullWidth>
-                    <InputLabel id="role-select-label">Rol</InputLabel>
-                    <Select
-                      labelId="role-select-label"
-                      value={selectedUser.role}
-                      label="Rol"
-                      onChange={(e) => {
-                        if (user && user.role === 'Admin') {
-                          handleRoleChange(selectedUser.userID, e.target.value);
-                          setSelectedUser({...selectedUser, role: e.target.value});
-                        } else {
-                          setSnackbar({
-                            open: true,
-                            message: 'Solo los administradores pueden cambiar roles',
-                            severity: 'error'
-                          });
-                        }
-                      }}
-                    >
-                      <MenuItem value="Admin">Administrador</MenuItem>
-                      <MenuItem value="Manager">Gerente</MenuItem>
-                      <MenuItem value="User">Usuario</MenuItem>
-                    </Select>
-                  </FormControl>
-                  
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mt: 2 }}>
-                    <Button 
-                      variant="outlined" 
-                      color="error"
-                      startIcon={<DeleteOutlined />}
-                      onClick={() => {
-                        if (window.confirm(`¿Está seguro que desea eliminar a ${selectedUser.firstname} ${selectedUser.lastname}?`)) {
-                          handleDeleteUser(selectedUser.userID);
-                        }
-                      }}
-                    >
-                      Eliminar
-                    </Button>
-                    <Button variant="outlined" onClick={() => setSelectedUser(null)}>
-                      Cerrar
-                    </Button>
-                  </Box>
-                </Stack>
-              </MainCard>
-            </motion.div>
-          </>
+          <DialogContent>
+            <Stack spacing={3}>
+              <Typography variant="h3">Editar usuario</Typography>
+
+              <Stack direction="column" spacing={2} alignItems="center">
+                <Avatar
+                  sx={{
+                    width: 100,
+                    height: 100,
+                    backgroundColor:
+                      selectedUser.role === 'Admin' ? 'info.main' : selectedUser.role === 'Manager' ? 'warning.main' : 'primary.main',
+                    mb: 1,
+                    fontSize: '2rem'
+                  }}
+                >
+                  {selectedUser.firstname[0]}
+                  {selectedUser.lastname[0]}
+                </Avatar>
+
+                <Typography variant="h4">
+                  {selectedUser.firstname} {selectedUser.lastname}
+                </Typography>
+
+                <Typography variant="body1" color="textSecondary">
+                  {selectedUser.email}
+                </Typography>
+              </Stack>
+
+              <FormControl fullWidth>
+                <InputLabel id="role-select-label">Rol</InputLabel>
+                <Select
+                  labelId="role-select-label"
+                  value={selectedUser.role}
+                  label="Rol"
+                  onChange={(e) => {
+                    if (user && user.role === 'Admin') {
+                      handleRoleChange(selectedUser.userID, e.target.value);
+                      setSelectedUser({ ...selectedUser, role: e.target.value });
+                    } else {
+                      setSnackbar({
+                        open: true,
+                        message: 'Solo los administradores pueden cambiar roles',
+                        severity: 'error'
+                      });
+                    }
+                  }}
+                >
+                  <MenuItem value="Admin">Administrador</MenuItem>
+                  <MenuItem value="Manager">Gerente</MenuItem>
+                  <MenuItem value="User">Usuario</MenuItem>
+                </Select>
+              </FormControl>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mt: 2 }}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<DeleteOutlined />}
+                  onClick={() => {
+                    if (window.confirm(`¿Está seguro que desea eliminar a ${selectedUser.firstname} ${selectedUser.lastname}?`)) {
+                      handleDeleteUser(selectedUser.userID);
+                    }
+                  }}
+                >
+                  Eliminar
+                </Button>
+                <Button variant="contained" onClick={() => setSelectedUser(null)}>
+                  Cerrar
+                </Button>
+              </Box>
+            </Stack>
+          </DialogContent>
         )}
-      </AnimatePresence>
+      </Dialog>
 
       {/* Dialog for adding new user */}
-      <Dialog 
-        open={openAddDialog} 
+      <Dialog
+        open={openAddDialog}
         onClose={() => setOpenAddDialog(false)}
         PaperProps={{
           sx: {
@@ -687,7 +776,7 @@ const UserRoles = () => {
             <Typography variant="h3">Agregar Nuevo Usuario</Typography>
           </Stack>
         </DialogTitle>
-        
+
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={6}>
@@ -696,20 +785,20 @@ const UserRoles = () => {
                 label="Nombre"
                 variant="outlined"
                 value={newUser.firstname}
-                onChange={(e) => setNewUser({...newUser, firstname: e.target.value})}
+                onChange={(e) => setNewUser({ ...newUser, firstname: e.target.value })}
               />
             </Grid>
-            
+
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 label="Apellido"
                 variant="outlined"
                 value={newUser.lastname}
-                onChange={(e) => setNewUser({...newUser, lastname: e.target.value})}
+                onChange={(e) => setNewUser({ ...newUser, lastname: e.target.value })}
               />
             </Grid>
-            
+
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -717,10 +806,10 @@ const UserRoles = () => {
                 variant="outlined"
                 type="email"
                 value={newUser.email}
-                onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
               />
             </Grid>
-            
+
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -728,10 +817,10 @@ const UserRoles = () => {
                 variant="outlined"
                 type="password"
                 value={newUser.password}
-                onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
               />
             </Grid>
-            
+
             <Grid item xs={12}>
               <FormControl fullWidth>
                 <InputLabel id="new-user-role-label">Rol</InputLabel>
@@ -739,33 +828,27 @@ const UserRoles = () => {
                   labelId="new-user-role-label"
                   value={newUser.role}
                   label="Rol"
-                  onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                 >
                   <MenuItem value="User">Usuario</MenuItem>
                   <MenuItem value="Manager">Gerente</MenuItem>
-                  {user && user.role === 'Admin' && (
-                    <MenuItem value="Admin">Administrador</MenuItem>
-                  )}
+                  {user && user.role === 'Admin' && <MenuItem value="Admin">Administrador</MenuItem>}
                 </Select>
               </FormControl>
             </Grid>
           </Grid>
         </DialogContent>
-        
+
         <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={() => setOpenAddDialog(false)} variant="outlined">
+          <Button onClick={() => setOpenAddDialog(false)} variant="contained" color="info">
             Cancelar
           </Button>
-          <Button 
-            onClick={handleAddUser} 
-            variant="contained"
-            startIcon={<PlusOutlined />}
-          >
+          <Button onClick={handleAddUser} variant="contained" startIcon={<PlusOutlined />}>
             Agregar Usuario
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={5000}
@@ -773,17 +856,23 @@ const UserRoles = () => {
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         sx={{ maxWidth: '80%' }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} variant="filled" sx={{ width: '100%' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
     </Box>
   );
 };
+
+// Add TabPanel component
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div role="tabpanel" hidden={value !== index} id={`tabpanel-${index}`} aria-labelledby={`tab-${index}`} {...other}>
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 export default UserRoles;

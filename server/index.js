@@ -1,9 +1,9 @@
 // index.js
-import express from 'express';
-import dotenv from 'dotenv';
-import accountRoutes from './routes/account.js';
-import requestRoutes from './routes/requests.js';
-import healthRoutes from './routes/health.js';
+const express = require('express');
+const dotenv = require('dotenv');
+const accountRoutes = require('./routes/account.js');
+const requestRoutes = require('./routes/requests.js');
+const healthRoutes = require('./routes/health.js');
 
 dotenv.config();
 
@@ -24,3 +24,5 @@ const PORT = process.env.NODE_PORT || 3010;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+// module.exports = app;

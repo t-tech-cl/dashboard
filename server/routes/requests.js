@@ -1,13 +1,13 @@
 // routes/requests.js
-import express from 'express';
-import {
+const express = require('express');
+const {
   createRequest,
   getAllRequests,
   getRequest,
   getLastRequestNumber,
   getAll,
   getAllExternalReports
-} from '../controllers/requestController.js';
+} = require('../controllers/requestController.js');
 
 const router = express.Router();
 
@@ -23,4 +23,4 @@ router.get('/get-all-external-reports', getAllExternalReports);
 // Route to get the last request
 router.get('/get-last', getLastRequestNumber);
 
-export default router;
+module.exports = router;

@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../db/index.js'; // Make sure to import the sequelize instance from db.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db/index.js'); // Make sure to import the sequelize instance from db.js
 
 const ExternalReport = sequelize.define(
   'ExternalReport',
@@ -55,4 +55,4 @@ ExternalReport.associate = (models) => {
   ExternalReport.belongsTo(models.Request, { foreignKey: 'requestID', as: 'requestID' });
 };
 
-export default ExternalReport;
+module.exports = ExternalReport;
