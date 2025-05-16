@@ -1,8 +1,8 @@
-import Request from '../models/Request.js'; // Import the Request model
-import ExternalReport from '../models/ExternalReport.js';
+const Request = require('../models/Request.js'); // Import the Request model
+const ExternalReport = require('../models/ExternalReport.js');
 
 // Create a new request using Sequelize
-export const createRequest = async (req, res) => {
+const createRequest = async (req, res) => {
   const {
     applicantName,
     applicantRole,
@@ -126,7 +126,7 @@ export const createRequest = async (req, res) => {
 };
 
 // Get all requests using Sequelize
-export const getAllRequests = async (req, res) => {
+const getAllRequests = async (req, res) => {
   try {
     // Fetch all requests from the database using Sequelize
     const requests = await Request.findAll({
@@ -143,7 +143,7 @@ export const getAllRequests = async (req, res) => {
 };
 
 // Get request using Sequelize
-export const getRequest = async (req, res) => {
+const getRequest = async (req, res) => {
   const { requestNumber } = req.query;
   try {
     const request = await Request.findOne({
@@ -161,7 +161,7 @@ export const getRequest = async (req, res) => {
 };
 
 // Get last request using Sequelize
-export const getLastRequestNumber = async (req, res) => {
+const getLastRequestNumber = async (req, res) => {
   try {
     // Find the request with the highest ID
     const lastRequest = await Request.findOne({
@@ -188,7 +188,7 @@ export const getLastRequestNumber = async (req, res) => {
   }
 };
 
-export const getAll = async (req, res) => {
+const getAll = async (req, res) => {
   try {
     const requests = await Request.findAll();
     return res.json(requests);
@@ -197,11 +197,20 @@ export const getAll = async (req, res) => {
   }
 };
 
-export const getAllExternalReports = async (req, res) => {
+const getAllExternalReports = async (req, res) => {
   try {
     const requests = await ExternalReport.findAll();
     return res.json(requests);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch requests' });
   }
+};
+
+module.exports = {
+  createRequest,
+  getAllRequests,
+  getRequest,
+  getLastRequestNumber,
+  getAll,
+  getAllExternalReports
 };

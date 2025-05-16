@@ -28,7 +28,6 @@ const Login = () => {
             >
               Registrarse
             </Typography>
-
           </Stack>
         </Grid>
         <Grid item xs={12}>

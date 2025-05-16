@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../db/index.js';
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db/index.js');
 
 const User = sequelize.define(
   'User',
@@ -33,6 +33,14 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       unique: true
     },
+    resetCode: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    resetCodeExpires: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
@@ -48,4 +56,4 @@ const User = sequelize.define(
   }
 );
 
-export default User;
+module.exports = User;

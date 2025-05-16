@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../db/index.js'; // Make sure to import the sequelize instance from db.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db/index.js'); // Make sure to import the sequelize instance from db.js
 
 const Request = sequelize.define(
   'Request',
@@ -104,4 +104,4 @@ Request.associate = (models) => {
   Request.belongsTo(models.User, { foreignKey: 'assignedTo', as: 'assignedTo' });
 };
 
-export default Request;
+module.exports = Request;

@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
           user
         }
       });
-      
+
       // Show success login message
       storeDispatch(
         openSnackbar({
@@ -113,7 +113,6 @@ export const AuthProvider = ({ children }) => {
           transition: 'SlideDown'
         })
       );
-
     } catch (error) {
       // Check if there's a response with an error type
       console.log('error', error);
@@ -201,17 +200,14 @@ export const AuthProvider = ({ children }) => {
     try {
       // Hash the password before sending
       const encryptedPass = SHA256(password).toString();
-      
-      const response = await axios.post(
-        ACCOUNT_ENDPOINTS.REGISTER,
-        {
-          email,
-          password: encryptedPass,
-          firstname,
-          lastname
-        }
-      );
-      
+
+      const response = await axios.post(ACCOUNT_ENDPOINTS.REGISTER, {
+        email,
+        password: encryptedPass,
+        firstname,
+        lastname
+      });
+
       // Show success message with the message from the response, if available
       storeDispatch(
         openSnackbar({
@@ -230,12 +226,12 @@ export const AuthProvider = ({ children }) => {
           transition: 'SlideDown'
         })
       );
-      
+
       return response.data;
     } catch (error) {
       // Handle registration errors
       const errorMessage = error.response?.data?.error || 'Error en el registro. Por favor intente nuevamente.';
-      
+
       storeDispatch(
         openSnackbar({
           open: true,
@@ -251,7 +247,7 @@ export const AuthProvider = ({ children }) => {
           }
         })
       );
-      
+
       throw error; // Re-throw the error so it can be caught by the form
     }
   };
@@ -259,6 +255,148 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setSession(null);
     dispatch({ type: LOGOUT });
+  };
+
+  const requestPasswordReset = async (email) => {
+    try {
+      const response = await axios.post('/api/account/request-password-reset', { email });
+
+      storeDispatch(
+        openSnackbar({
+          open: true,
+          message: 'Se ha enviado un código de verificación a tu correo',
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: true,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'center'
+          }
+        })
+      );
+
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Error al solicitar el restablecimiento de contraseña';
+
+      storeDispatch(
+        openSnackbar({
+          open: true,
+          message: errorMessage,
+          variant: 'alert',
+          alert: {
+            color: 'error'
+          },
+          close: true,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'center'
+          }
+        })
+      );
+
+      throw error;
+    }
+  };
+
+  const verifyResetCode = async (email, resetCode) => {
+    try {
+      const response = await axios.post('/api/account/verify-reset-code', {
+        email,
+        resetCode
+      });
+
+      storeDispatch(
+        openSnackbar({
+          open: true,
+          message: 'Código verificado correctamente',
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: true,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'center'
+          }
+        })
+      );
+
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Error al verificar el código';
+
+      storeDispatch(
+        openSnackbar({
+          open: true,
+          message: errorMessage,
+          variant: 'alert',
+          alert: {
+            color: 'error'
+          },
+          close: true,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'center'
+          }
+        })
+      );
+
+      throw error;
+    }
+  };
+
+  const verifyResetCodeAndUpdatePassword = async (email, resetCode, newPassword) => {
+    try {
+      // Hash the password before sending
+      const encryptedPass = SHA256(newPassword).toString();
+
+      const response = await axios.post('/api/account/reset-password', {
+        email,
+        resetCode,
+        newPassword: encryptedPass
+      });
+
+      storeDispatch(
+        openSnackbar({
+          open: true,
+          message: 'Tu contraseña ha sido actualizada exitosamente',
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: true,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'center'
+          }
+        })
+      );
+
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Error al verificar el código o actualizar la contraseña';
+
+      storeDispatch(
+        openSnackbar({
+          open: true,
+          message: errorMessage,
+          variant: 'alert',
+          alert: {
+            color: 'error'
+          },
+          close: true,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'center'
+          }
+        })
+      );
+
+      throw error;
+    }
   };
 
   const resetPassword = async () => {};
@@ -270,7 +408,21 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout, register, resetPassword, updateProfile }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{
+        ...state,
+        login,
+        logout,
+        register,
+        resetPassword,
+        requestPasswordReset,
+        verifyResetCode,
+        verifyResetCodeAndUpdatePassword,
+        updateProfile
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 

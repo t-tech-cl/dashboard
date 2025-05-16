@@ -1,4 +1,4 @@
-import sequelize from '../db/index.js';
+const sequelize = require('../db/index.js');
 
 const healthRoutes = async (req, res) => {
   try {
@@ -17,4 +17,4 @@ const healthRoutes = async (req, res) => {
   }
 };
 
-export default healthRoutes;
+module.exports = healthRoutes;

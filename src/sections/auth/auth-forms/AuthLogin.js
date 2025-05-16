@@ -32,7 +32,7 @@ import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 // ============================|| JWT - LOGIN ||============================ //
 
-const AuthLogin = ({ isDemo = false }) => {
+const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);
 
   const { login } = useAuth();
@@ -148,7 +148,7 @@ const AuthLogin = ({ isDemo = false }) => {
                   }
                   label={<Typography variant="h6">Mantener sesión iniciada</Typography>}
                 />
-                <Link variant="h6" component={RouterLink} to={isDemo ? '/auth/forgot-password' : '/forgot-password'} color="text.primary">
+                <Link variant="h6" component={RouterLink} to={'/forgot-password'} color="primary">
                   ¿Olvidaste tu contraseña?
                 </Link>
               </Stack>

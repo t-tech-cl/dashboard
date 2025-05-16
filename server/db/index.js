@@ -1,5 +1,5 @@
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
+const { Sequelize } = require('sequelize');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
@@ -19,6 +19,9 @@ const testConnection = async () => {
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
+
+    await sequelize.sync({ alter: true });
+    console.log('Database synchronized with models.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
@@ -27,4 +30,4 @@ const testConnection = async () => {
 // Call the function to test the connection
 testConnection();
 
-export default sequelize;
+module.exports = sequelize;
